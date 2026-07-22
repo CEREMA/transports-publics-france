@@ -1,0 +1,22 @@
+
+name: PR validation
+
+on:
+  pull_request:
+    branches: [main]
+
+jobs:
+  validation:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+      - name: Setup Python
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
+        with:
+          python-version: "3.12"
+      - name: Check Black style
+        uses: psf/black@354c61aad99ee26eb7794d91f92d837afefa0f25
+        with:
+          options: "--line-length 100 --check --diff"
+          version: "~=25.1.0"
