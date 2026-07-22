@@ -1,3 +1,4 @@
+# Checks that the PR title follows conventional commit
 
 name: Check PR title
 

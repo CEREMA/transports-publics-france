@@ -1,3 +1,4 @@
+# Performs checks on the codebase (formatting, tests, ..)
 
 name: PR validation
 
