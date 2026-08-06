@@ -19,5 +19,5 @@ jobs:
       - name: Check Black style
         uses: psf/black@354c61aad99ee26eb7794d91f92d837afefa0f25
         with:
-          options: "--line-length 100 --check --diff"
+          options: "--check --diff"
           version: "~=25.1.0"
