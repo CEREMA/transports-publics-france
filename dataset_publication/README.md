@@ -1,3 +1,9 @@
+# Datasets
+
+`transports-publics-france` contains code to generate and update several datasets available on the Cerema organisation of [data.gouv.fr]([https://data.gouv.fr](https://www.data.gouv.fr/organizations/cerema/datasets)).
+
+Each `{key}_dataset.py` is related to a specific dataset 
+and contains instructions to generate and update its files.
 
 ## List of datasets and their generating scripts
 
@@ -11,17 +17,28 @@ Publishes the package license to [demo.data.gouv.fr](https://demo.data.gouv.fr).
 
 - license.txt: the package license
 
+## Run the generation of dataset resources
 
-## How to add a new dataset to `transports-publics-france`
+Run this command to generate resources' files without updating the remote dataset
 
-1. Create your dataset and resources in [data.gouv.fr](https://www.data.gouv.fr) using the Cerema organization
-2. Create a new `{key}_dataset.py` file, with `{key}` being your dataset key *in the package*
-3. In this file, define a class that inherits `datasets_publication.utils.DatasetManager`. It must implement all the abstract methods of `DatasetManager` (see example in [demo_dataset.py](demo_dataset.py)):
-   1. `_dataset_id`: returns the *data.gouv.fr* id of the dataset you want to update
-   2. `generate_dataset_ressources`: actual code that generates the resources' files
-   3. `_resources`: returns a list of resource information
-         1. `id`: resource id *in data.gouv.fr*
-         2. `file`: path to resource file
-         3. `payload`: dict containing resource information (see [API doc](https://guides.data.gouv.fr/api-de-data.gouv.fr/reference/datasets?select=par-api#put-datasets-dataset-resources-rid) for available fields)
-4. Run `TODO` to test your class without updating the remote dataset. Check that the files generated in the dataset folder fit your expectations
-5. Update this README with your dataset information
+```bash
+# TODO
+```
+
+### Updating the datasets on data.gouv.fr
+
+_This action is only available for the repository maintainers._
+
+#### GitHub action
+
+Prefer using the `TODO` GitHub action.
+If you are authorized, you can trigger it from the `Actions` tab of GitHub.
+
+#### Running the update locally
+
+You will need an authorized API key stored in the `DATAGOUV_API_KEY` environment variable.
+Then, run 
+
+```bash
+# TODO
+```
