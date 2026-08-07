@@ -1,6 +1,6 @@
 # Datasets
 
-`transports-publics-france` contains code to generate and update several datasets available on the Cerema organisation of [data.gouv.fr]([https://data.gouv.fr](https://www.data.gouv.fr/organizations/cerema/datasets)).
+`transports-publics-france` contains code to generate and update several datasets available on the Cerema organisation of [data.gouv.fr](https://www.data.gouv.fr/organizations/cerema/datasets).
 
 Each `{key}_dataset.py` is related to a specific dataset 
 and contains instructions to generate and update its files.
