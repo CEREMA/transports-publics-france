@@ -1,6 +1,7 @@
 """
 Dataset update class demonstration.
 """
+
 from dataset_publication import DatasetManager
 
 
@@ -10,7 +11,9 @@ class DemoDataset(DatasetManager):
     """
 
     def __init__(self, authenticate=True, verbose=False, dry=False):
-        super().__init__(environment="demo", authenticate=authenticate, verbose=verbose, dry=dry)
+        super().__init__(
+            environment="demo", authenticate=authenticate, verbose=verbose, dry=dry
+        )
 
     def _dataset_id(self):
         return "6a75b2fe90f2b13aa640af68"
@@ -20,7 +23,7 @@ class DemoDataset(DatasetManager):
             {
                 "id": "c1d3d857-cb33-45a8-ab13-e9d72218486b",
                 "payload": {},
-                "file": "LICENSE.txt"
+                "file": "LICENSE.txt",
             }
         ]
 
@@ -32,5 +35,3 @@ class DemoDataset(DatasetManager):
 # TODO: replace this with a proper command:
 #   uv run update_dataset demo_dataset --verbose
 DemoDataset(verbose=True, dry=True).update_resources()
-
-

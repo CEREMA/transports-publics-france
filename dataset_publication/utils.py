@@ -1,6 +1,7 @@
 """
 Utils for data.gouv.fr interaction and dataset management.
 """
+
 from abc import abstractmethod, ABC
 from datagouv import Client, Organization, Dataset
 import os
@@ -10,6 +11,7 @@ CEREMA_ORGANIZATION_ID = "6a75a00e8db350b8b2913fa4"
 
 # TODO: define function in package
 VERSION = "0.1.0"
+
 
 class DatasetManager(ABC):
     """
@@ -61,7 +63,9 @@ class DatasetManager(ABC):
             resource_file = resource_data["file"]
 
             # get resource info and add additional fields
-            resource_payload = self.get_full_resource_payload(resource_data.get('payload', dict()))
+            resource_payload = self.get_full_resource_payload(
+                resource_data.get("payload", dict())
+            )
 
             # update resource
             self._update_resource(resource_id, resource_payload, resource_file)
@@ -129,7 +133,6 @@ class DatasetManager(ABC):
         """
         pass
 
-
     # utils
 
     def log(self, message):
@@ -142,8 +145,9 @@ class DatasetManager(ABC):
             print(message)
 
 
-
-def get_datagouv_client(environment: str="www", authenticate: bool=True, verbose=False) -> Client:
+def get_datagouv_client(
+    environment: str = "www", authenticate: bool = True, verbose=False
+) -> Client:
     """
     Create a datagouv.Client instance.
 
@@ -166,7 +170,7 @@ def get_datagouv_client(environment: str="www", authenticate: bool=True, verbose
     return Client(environment=environment, api_key=api_key, verbose=verbose)
 
 
-def get_cerema_organization(client: Client|None=None) -> Organization:
+def get_cerema_organization(client: Client | None = None) -> Organization:
     """
     Get a datagouv.Organization instance for the Cerema organisation.
 
@@ -176,4 +180,3 @@ def get_cerema_organization(client: Client|None=None) -> Organization:
     """
     client = client or get_datagouv_client(authenticate=False)
     return client.organization(CEREMA_ORGANIZATION_ID)
-
