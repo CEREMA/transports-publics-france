@@ -4,27 +4,33 @@
 
 Thank you for considering contributing to `transports-publics-france` !
 
-## Getting started
-
-#### If you find a security vulnerability:
+### If you find a security vulnerability:
 
   - do NOT open an issue. Contact us directly instead
 
-#### If you've found a bug:
+### If you've found a bug:
 
   - search through the [project issues](https://github.com/CEREMA/transports-publics-france/issues)
   - if you don't find your bug in the listed issues, open a new one
 
-#### If you have a feature proposal or want to contribute:
+### If you have a feature proposal or want to contribute:
 
   - post your proposal on the [issue tracker](https://github.com/CEREMA/transports-publics-france/issues) so we can review it together
   - fork the repo, make your change, test it, and submit a PR
+
+## Getting started
+
+Make sure to install all the project dependencies by running
+
+```bash
+uv sync --all-extras
+```
 
 ## Coding style and commit messages
     
 ### Coding style
 
-The coding style imposed on `transports-publics-france` includes:
+The coding style on `transports-publics-france` includes:
 
   - respect [PEP8 style guide](https://peps.python.org/pep-0008/) as much as possible
   - write code in english
@@ -46,7 +52,7 @@ def function(param1: str, param2: int):
 
 ### Black formatting
 
-We use Black for formatting the codebase.
+We use [Black](https://black.readthedocs.io/en/stable/the_black_code_style/current_style.html) for formatting the codebase.
 
 **Don't try to fit Black's style yourself !** A code formatter is meant to be run after
 you've finished coding to ensure uniform style.
@@ -71,7 +77,7 @@ in order to generate a [changelog from the commits](https://github.com/conventio
 
 ### Run tests locally
 
-Run tests from the root of the project using pytest. Use the -v option for verbose output.
+Run tests from the root of the project using [pytest](https://docs.pytest.org/en/stable/). Use the -v option for verbose output.
 
 ```bash
 pytest [-v]
