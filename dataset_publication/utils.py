@@ -5,11 +5,9 @@ Utils for data.gouv.fr interaction and dataset management.
 from abc import abstractmethod, ABC
 from datagouv import Client, Organization, Dataset
 import os
+from transports_publics_france.utils import get_package_version
 
 CEREMA_ORGANIZATION_ID = "5c812a16634f416583ed1876"
-
-# TODO: define function in package
-VERSION = "0.1.0"
 
 
 class DatasetManager(ABC):
@@ -94,7 +92,7 @@ class DatasetManager(ABC):
         extras = payload.get("extras", dict())
 
         # store package version in resource extras
-        extras["transports-publics-france-version"] = VERSION
+        extras["transports-publics-france-version"] = get_package_version()
 
         payload["extras"] = extras
         return payload
