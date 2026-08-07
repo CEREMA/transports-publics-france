@@ -7,3 +7,8 @@ requires-python = ">=3.12"
 dependencies = [
     "datagouv-client>=0.5.0",
 ]
+
+[dependency-groups]
+dev = [
+    "black==25.1.0",
+]
