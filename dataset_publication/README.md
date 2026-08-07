@@ -42,3 +42,7 @@ Then, run
 ```bash
 # TODO
 ```
+
+## Adding new datasets to `transports-publics-france`
+
+On how to implement new dataset file generation, see [CONTRIBUTING.md](../CONTRIBUTING.md).
