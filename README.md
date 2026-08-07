@@ -13,7 +13,7 @@ as a script to export datasets.
 
 ### Using as a package
 
-The `transports-publics-france` package is available on PiPy and can be installed using pip:
+The `transports-publics-france` package will soon be available on PiPy and can be installed using pip:
 
 ```bash
 pip install transports-publics-france
