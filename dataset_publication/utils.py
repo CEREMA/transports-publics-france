@@ -6,8 +6,7 @@ from abc import abstractmethod, ABC
 from datagouv import Client, Organization, Dataset
 import os
 
-# TODO: replace with CEREMA ORG
-CEREMA_ORGANIZATION_ID = "6a75a00e8db350b8b2913fa4"
+CEREMA_ORGANIZATION_ID = "5c812a16634f416583ed1876"
 
 # TODO: define function in package
 VERSION = "0.1.0"
