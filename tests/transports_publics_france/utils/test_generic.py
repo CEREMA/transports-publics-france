@@ -9,4 +9,3 @@ def test_get_package_version():
     assert len(split) == 3
     for part in split:
         assert part.isdigit()
-
