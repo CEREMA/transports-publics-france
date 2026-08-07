@@ -2,7 +2,7 @@
 Dataset update class demonstration.
 """
 
-from dataset_publication import DatasetManager
+from dataset_publication.utils import DatasetManager
 
 
 class DemoDataset(DatasetManager):

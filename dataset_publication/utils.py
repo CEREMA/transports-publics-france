@@ -34,7 +34,6 @@ class DatasetManager(ABC):
         self.dry: bool = dry
         self.client: Client = get_datagouv_client(environment, authenticate, verbose)
         self._dataset = None
-        self.organisation = get_cerema_organization(self.client)
 
     @property
     def dataset_id(self):
