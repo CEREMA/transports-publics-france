@@ -25,16 +25,16 @@ Run this command to generate resources' files without updating the remote datase
 # TODO
 ```
 
-### Updating the datasets on data.gouv.fr
+## Updating the datasets on data.gouv.fr
 
-_This action is only available for the repository maintainers._
+_This action is only available for the repository maintainers and owners of an authorized account on the Cerema organization._
 
-#### GitHub action
+### GitHub action
 
 Prefer using the `TODO` GitHub action.
 If you are authorized, you can trigger it from the `Actions` tab of GitHub.
 
-#### Running the update locally
+### Running the update locally
 
 You will need an authorized API key stored in the `DATAGOUV_API_KEY` environment variable.
 Then, run 
