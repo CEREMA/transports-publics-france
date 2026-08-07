@@ -11,7 +11,7 @@ TODO (mention the division between the python package and the dataset generation
 
 ### Using as a package
 
-The `transports-publics-france` package will soon be available on PiPy and can be installed with
+The `transports-publics-france` package will soon be available on PyPi and can be installed with
 
 ```bash
 # using uv
@@ -21,7 +21,7 @@ uv add transports-publics-france
 pip install transports-publics-france
 ```
 
-### Running the dataset export scripts
+### Running the dataset generation scripts
 
 TODO
 
