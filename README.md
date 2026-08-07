@@ -1,21 +1,23 @@
 # transports-publics-france
 
-TODO: short description
+This repository contains code related to the processing and analysis of data related to french public transports.
 
-package
-also code for publising datasets
+TODO (mention the division between the python package and the dataset generation scripts)
 
 
 ## Usage
 
-`transports-publics-france` can be used as a Python package or
-as a script to export datasets.
+`transports-publics-france` can be used as a Python package or as a script to generate datasets.
 
 ### Using as a package
 
-The `transports-publics-france` package will soon be available on PiPy and can be installed using pip:
+The `transports-publics-france` package will soon be available on PiPy and can be installed with
 
 ```bash
+# using uv
+uv add transports-publics-france
+
+# using pip
 pip install transports-publics-france
 ```
 
