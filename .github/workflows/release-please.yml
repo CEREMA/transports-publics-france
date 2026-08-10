@@ -1,0 +1,51 @@
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+name: release-please
+
+jobs:
+  release-please:
+    runs-on: ubuntu-latest
+    outputs:
+      release_created: ${{ steps.release.outputs.release_created }}
+      version: ${{ steps.release.outputs.tag_name }}
+    steps:
+      - name: Create release
+        id: release
+        uses: googleapis/release-please-action@v3
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          release-type: python
+  publish:
+    runs-on: ubuntu-latest
+    if: ${{ needs.release-please.outputs.release_created }}
+    needs: release-please
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@696e4e1bf2f38a7ac027afc72ca9d963427412ae
+        with:
+          enable-cache: true
+          cache-dependency-glob: "uv.lock"
+
+      - name: Set up Python
+        run: uv python install
+
+      - name: Install build dependencies
+        run: uv sync --all-extras
+
+      - name: Build the project
+        run: uv build
+
+      - name: Publish to PyPI
+        run: uv publish --token ${{ secrets.PYPI_API_TOKEN }}
+
