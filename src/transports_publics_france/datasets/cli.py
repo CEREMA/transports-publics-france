@@ -8,42 +8,48 @@ import argparse
 from transports_publics_france.datasets import DatasetManager, DATASET_KEY_MAPPER
 
 
-parser = argparse.ArgumentParser(
-    description="Generate resources of the transports-publics-france datasets",
-)
+def create_parser():
+    parser = argparse.ArgumentParser(
+        description="Generate resources of the transports-publics-france datasets",
+    )
 
-parser.add_argument(
-    "dataset",
-    help="dataset key, in '{key}_dataset.py' ",
-    metavar="DATASET_KEY",
-    choices=['demo'],
-    type=str,
-    action="store",
-)
+    parser.add_argument(
+        "dataset",
+        help="dataset key, in '{key}_dataset.py' ",
+        metavar="DATASET_KEY",
+        choices=['demo'],
+        type=str,
+        action="store",
+    )
 
-parser.add_argument(
-    "--verbose",
-    help="detailed logging if true",
-    action="store_true",
-)
+    parser.add_argument(
+        "--verbose",
+        help="detailed logging if true",
+        action="store_true",
+    )
 
-parser.add_argument(
-    "--publish",
-    help="publish the generated dataset to data.gouv.fr with the given token, or using the DATAGOUV_API_KEY env variable",
-    metavar="DATAGOUV_API_KEY",
-    action="store"
-)
+    parser.add_argument(
+        "--publish",
+        help="publish the generated dataset to data.gouv.fr with the given token, or using the DATAGOUV_API_KEY env variable",
+        metavar="DATAGOUV_API_KEY",
+        action="store"
+    )
 
-parser.add_argument(
-    "--dry-publish",
-    help="run the publication pipeline without actually updating the datasets on data.gouv.fr",
-    action="store_true",
-)
+    parser.add_argument(
+        "--dry-publish",
+        help="run the publication pipeline without actually updating the datasets on data.gouv.fr",
+        action="store_true",
+    )
+
+    return parser
 
 
 
 def main():
-    # read commandline arguments
+    # get command line parser
+    parser = create_parser()
+
+    # read command line arguments and parse them
     input_args = parser.parse_args()
 
     # check publish args
