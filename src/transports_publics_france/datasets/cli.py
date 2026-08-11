@@ -43,6 +43,7 @@ parser.add_argument(
 
 
 def main():
+    # read commandline arguments
     input_args = parser.parse_args()
 
     # check publish args
@@ -56,7 +57,7 @@ def main():
     except KeyError:
         raise ValueError(f"Dataset key {input_args.dataset} was not found")
 
-    # generate resources
+    # generate datasets resources
     dataset_manager.generate_dataset_ressources()
 
     # publish or dry publish if asked
