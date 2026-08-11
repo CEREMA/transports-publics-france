@@ -2,7 +2,7 @@
 Utils for data.gouv.fr interaction and dataset management.
 """
 
-from abc import abstractmethod, ABC
+from abc import ABC, abstractmethod
 from datagouv import Client, Organization, Dataset
 import os
 from transports_publics_france.utils import get_package_version
@@ -33,19 +33,12 @@ class DatasetManager(ABC):
         self._dataset = None
 
     @property
-    def dataset_id(self):
-        """
-        Dataset id property
-        """
-        return self._dataset_id()
-
-    @property
     def dataset(self) -> Dataset:
         """
         Instance of datagouv.Dataset for the managed dataset.
         """
         if self._dataset is None:
-            self._dataset = self.client.dataset(self.dataset_id)
+            self._dataset = self.client.dataset(self.dataset_id())
         return self._dataset
 
     # resource update
@@ -99,10 +92,11 @@ class DatasetManager(ABC):
 
     # dataset specific methods to override
 
+    @classmethod
     @abstractmethod
-    def _dataset_id(self) -> str:
+    def dataset_id(cls) -> str:
         """
-        Defines dataset id as a string.
+        Dataset id as a string.
 
         :return: dataset id as a string
         """

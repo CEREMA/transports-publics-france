@@ -2,7 +2,7 @@
 Dataset update class demonstration.
 """
 
-from dataset_publication.utils import DatasetManager
+from transports_publics_france.datasets.utils import DatasetManager
 
 
 class DemoDataset(DatasetManager):
@@ -15,7 +15,8 @@ class DemoDataset(DatasetManager):
             environment="demo", authenticate=authenticate, verbose=verbose, dry=dry
         )
 
-    def _dataset_id(self):
+    @classmethod
+    def dataset_id(cls):
         return "6a75b2fe90f2b13aa640af68"
 
     def _resources(self) -> list[dict]:
@@ -30,8 +31,3 @@ class DemoDataset(DatasetManager):
     def generate_dataset_ressources(self):
         # nothing to do, LICENSE.txt already exists
         pass
-
-
-# TODO: replace this with a proper command:
-#   uv run update_dataset demo_dataset --verbose
-DemoDataset(verbose=True, dry=True).update_resources()
