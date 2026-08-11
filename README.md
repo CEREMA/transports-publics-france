@@ -38,11 +38,3 @@ For detailed help on the command arguments, run
 ```bash
 uv run generate-dataset -h
 ```
-
-## License
-
-Feel free to use the `transports-publics-france` project as long as you comply with the [CeCILL-B license](LICENSE.txt) terms.
-
-## Contributing
-
-Feedback and contributions are very welcome, see [CONTRIBUTING.md](CONTRIBUTING.md) for more information !
