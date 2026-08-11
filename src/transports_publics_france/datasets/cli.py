@@ -5,10 +5,7 @@ Exposed with uv as `uv run generate-dataset DATASET_KEY`
 """
 
 import argparse
-import os
 from transports_publics_france.datasets import DatasetManager, DATASET_KEY_MAPPER
-
-NO_API_KEY = "NO_API_KEY"
 
 
 parser = argparse.ArgumentParser(
