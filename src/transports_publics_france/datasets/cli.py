@@ -17,7 +17,7 @@ def create_parser():
         "dataset",
         help="dataset key, in '{key}_dataset.py' ",
         metavar="DATASET_KEY",
-        choices=['demo'],
+        choices=["demo"],
         type=str,
         action="store",
     )
@@ -33,7 +33,7 @@ def create_parser():
         "--publish",
         help="publish the generated dataset to data.gouv.fr with the given token, or using the DATAGOUV_API_KEY env variable",
         metavar="DATAGOUV_API_KEY",
-        action="store"
+        action="store",
     )
 
     parser.add_argument(
@@ -43,7 +43,6 @@ def create_parser():
     )
 
     return parser
-
 
 
 def main():
@@ -73,6 +72,3 @@ def main():
         pass
     elif input_args.dry_publish:
         pass
-
-
-
