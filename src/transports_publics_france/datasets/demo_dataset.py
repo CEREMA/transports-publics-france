@@ -3,6 +3,7 @@ Dataset update class demonstration.
 """
 
 from transports_publics_france.datasets.utils import DatasetManager
+import shutil
 
 
 class DemoDataset(DatasetManager):
@@ -14,6 +15,10 @@ class DemoDataset(DatasetManager):
         super().__init__(
             environment="demo", authenticate=authenticate, verbose=verbose, dry=dry
         )
+
+    @classmethod
+    def dataset_key(cls) -> str:
+        return "demo"
 
     @classmethod
     def dataset_id(cls):
@@ -28,6 +33,6 @@ class DemoDataset(DatasetManager):
             }
         ]
 
-    def generate_dataset_ressources(self):
-        # nothing to do, LICENSE.txt already exists
-        pass
+    def _generate_dataset_ressources(self):
+        # copy LICENSE.txt to dataset folder
+        shutil.copyfile("LICENSE.txt", self.folder + "LICENSE.txt")
