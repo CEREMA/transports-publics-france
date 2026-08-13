@@ -23,6 +23,7 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           release-type: python
+          config-file: .github/release-please-config.json
   publish:
     runs-on: ubuntu-latest
     if: ${{ needs.release-please.outputs.release_created }}
