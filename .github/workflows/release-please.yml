@@ -19,10 +19,10 @@ jobs:
     steps:
       - name: Create release
         id: release
-        uses: googleapis/release-please-action@v3
+        uses: googleapis/release-please-action@45996ed1f6d02564a971a2fa1b5860e934307cf7
         with:
-          manifest-file: .github/.release-please-manifest.json
           config-file: .github/release-please-config.json
+          manifest-file: .github/.release-please-manifest.json
           token: ${{ secrets.GITHUB_TOKEN }}
   publish:
     runs-on: ubuntu-latest
