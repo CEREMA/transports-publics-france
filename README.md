@@ -21,14 +21,20 @@ uv add transports-publics-france
 pip install transports-publics-france
 ```
 
-### Running the dataset generation scripts
+### Generate dataset resources
 
-TODO
+`transports-publics-france` contains the source code used to generate the resources
+of [several opendata datasets](src/transports_publics_france/datasets/README.md).
 
-## License
+You can reproduce this generation process by running the following command
 
-Feel free to use the `transports-publics-france` project as long as you comply with the [CeCILL-B license](LICENSE.txt) terms.
+```bash
+# DATASET_KEY is the prefix in `{key}_dataset.py`
+uv run generate-dataset DATASET_KEY
+```
 
-## Contributing
+For detailed help on the command arguments, run
 
-Feedback and contributions are very welcome, see [CONTRIBUTING.md](CONTRIBUTING.md) for more information !
+```bash
+uv run generate-dataset -h
+```

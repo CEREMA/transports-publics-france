@@ -2,12 +2,14 @@
 Utils for data.gouv.fr interaction and dataset management.
 """
 
-from abc import abstractmethod, ABC
+from abc import ABC, abstractmethod
 from datagouv import Client, Organization, Dataset
 import os
 from transports_publics_france.utils import get_package_version
 
 CEREMA_ORGANIZATION_ID = "5c812a16634f416583ed1876"
+
+DATASET_FOLDER = "generated_datasets/"
 
 
 class DatasetManager(ABC):
@@ -33,20 +35,32 @@ class DatasetManager(ABC):
         self._dataset = None
 
     @property
-    def dataset_id(self):
-        """
-        Dataset id property
-        """
-        return self._dataset_id()
-
-    @property
     def dataset(self) -> Dataset:
         """
         Instance of datagouv.Dataset for the managed dataset.
         """
         if self._dataset is None:
-            self._dataset = self.client.dataset(self.dataset_id)
+            self._dataset = self.client.dataset(self.dataset_id())
         return self._dataset
+
+    @property
+    def folder(self) -> str:
+        """
+        Dataset folder where intermediate files and results are generated.
+        """
+        return os.path.join(DATASET_FOLDER, self.dataset_key(), "")
+
+    # resource generation
+
+    def generate_dataset_ressources(self):
+        """
+        Prepare resource generation and call the _generate_dataset_ressources method.
+        """
+        # create target folder
+        self.create_folder()
+
+        # call resource generation method
+        self._generate_dataset_ressources()
 
     # resource update
 
@@ -71,14 +85,19 @@ class DatasetManager(ABC):
         Update the resource with the given payload and file.
 
         If dry, just check that the resource file exists.
+
+        :param resource_id: resource id
+        :param payload: resource info payload
+        :param file: resource file name
         """
-        message = f"Updated resource {resource_id} with file: {file}"
+        filepath = os.path.join(self.folder, file)
+        message = f"Updated resource {resource_id} with file: {filepath}"
         if self.dry:
             message = message.replace("Updated", "Dry updated")
-            if not os.path.exists(file):
-                raise FileNotFoundError(f"Resource file not found: {file}")
+            if not os.path.exists(filepath):
+                raise FileNotFoundError(f"Resource file not found: {filepath}")
         else:
-            self.client.resource(resource_id).update(payload, file)
+            self.client.resource(resource_id).update(payload, filepath)
         self.log(message)
 
     def get_full_resource_payload(self, payload: dict) -> dict:
@@ -99,19 +118,32 @@ class DatasetManager(ABC):
 
     # dataset specific methods to override
 
+    @classmethod
     @abstractmethod
-    def _dataset_id(self) -> str:
+    def dataset_key(cls) -> str:
         """
-        Defines dataset id as a string.
+        Dataset key as a string.
+
+        :return: dataset key as a string
+        """
+        pass
+
+    @classmethod
+    @abstractmethod
+    def dataset_id(cls) -> str:
+        """
+        Dataset id as a string.
 
         :return: dataset id as a string
         """
         pass
 
     @abstractmethod
-    def generate_dataset_ressources(self):
+    def _generate_dataset_ressources(self):
         """
         Generate files that will be used to update the dataset resources.
+
+        Resources should be generated in the {DATASET_FOLDER}/{dataset_key}/ folder.
         """
         pass
 
@@ -139,6 +171,12 @@ class DatasetManager(ABC):
         """
         if self.verbose:
             print(message)
+
+    def create_folder(self):
+        """
+        Create the dataset folder if it doesn't already exist.
+        """
+        os.makedirs(self.folder, exist_ok=True)
 
 
 def get_datagouv_client(
