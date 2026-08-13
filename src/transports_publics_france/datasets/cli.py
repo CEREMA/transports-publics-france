@@ -23,6 +23,7 @@ def create_parser():
     )
 
     parser.add_argument(
+        "-v",
         "--verbose",
         help="detailed logging if true",
         action="store_true",
