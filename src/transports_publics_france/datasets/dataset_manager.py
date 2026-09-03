@@ -115,7 +115,9 @@ class DatasetManager(ABC):
 
         :param api_key: API key used to authenticate to datagouv.fr
         """
-        self.datagouv_client = datagouv.Client(environment=self._client_environment, api_key=api_key, verbose=self.verbose)
+        self.datagouv_client = datagouv.Client(
+            environment=self._client_environment, api_key=api_key, verbose=self.verbose
+        )
 
     def update_datagouv_dataset(self, dry: bool):
         """
@@ -126,7 +128,9 @@ class DatasetManager(ABC):
         # store dry value
         self._dry_update_datagouv = dry
 
-        self.log(f"Start updating '{self.dataset_key()}' dataset on datagouv.fr (datagouv id: {self.dataset_id()})")
+        self.log(
+            f"Start updating '{self.dataset_key()}' dataset on datagouv.fr (datagouv id: {self.dataset_id()})"
+        )
         self._update_datagouv_dataset()
 
     @abstractmethod
@@ -144,7 +148,9 @@ class DatasetManager(ABC):
 
     # resource update
 
-    def _add_resource_file(self, filename: str, title: str, payload: dict | None = None) -> str:
+    def _add_resource_file(
+        self, filename: str, title: str, payload: dict | None = None
+    ) -> str:
         """
         Add a new resource file to the dataset.
 
@@ -164,7 +170,7 @@ class DatasetManager(ABC):
         payload["title"] = title
 
         # perform checks and data preparation
-        filepath , full_payload = self._prepare_resource_update(filename, payload)
+        filepath, full_payload = self._prepare_resource_update(filename, payload)
 
         resource_id = "#"
         if not self._dry_update_datagouv:
@@ -172,10 +178,14 @@ class DatasetManager(ABC):
             resource_id = self.dataset.create_static(filepath, full_payload).id
 
         # log success
-        self.log(f"{"[Dry] " if self._dry_update_datagouv else ""}Created resource '{title}' ({resource_id}) from file: {filepath}")
+        self.log(
+            f"{"[Dry] " if self._dry_update_datagouv else ""}Created resource '{title}' ({resource_id}) from file: {filepath}"
+        )
         return resource_id
 
-    def _replace_resource_file(self, resource_id: str, filename: str, payload: dict| None =None):
+    def _replace_resource_file(
+        self, resource_id: str, filename: str, payload: dict | None = None
+    ):
         """
         Update the resource with the given payload and file.
 
@@ -186,14 +196,18 @@ class DatasetManager(ABC):
         :param payload: resource info payload
         """
         # perform checks and data preparation
-        filepath, full_payload = self._prepare_resource_update(filename, payload or dict())
+        filepath, full_payload = self._prepare_resource_update(
+            filename, payload or dict()
+        )
 
         if not self._dry_update_datagouv:
             # update resource file
             self.datagouv_client.resource(resource_id).update(full_payload, filepath)
 
         # log success
-        self.log(f"{"[Dry] " if self._dry_update_datagouv else ""}Updated resource {resource_id} with file: {filepath}")
+        self.log(
+            f"{"[Dry] " if self._dry_update_datagouv else ""}Updated resource {resource_id} with file: {filepath}"
+        )
 
         return resource_id
 
@@ -249,7 +263,6 @@ class DatasetManager(ABC):
         Create the dataset folder if it doesn't already exist.
         """
         os.makedirs(self.folder, exist_ok=True)
-
 
 
 def get_cerema_organization(api_key: str | None = None) -> datagouv.Organization:

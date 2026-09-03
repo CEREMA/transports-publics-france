@@ -11,13 +11,12 @@ class DemoDataset(DatasetManager):
     """
     Demonstration class that pushes the package license to a demo dataset.
     """
+
     LICENSE_RESOURCE_FILENAME = "LICENSE_RESOURCE.txt"
 
     # ignore the __init__ if using this class as an example
     def __init__(self, verbose=False):
-        super().__init__(
-            environment="demo", verbose=verbose
-        )
+        super().__init__(environment="demo", verbose=verbose)
 
     @classmethod
     def dataset_id(cls):

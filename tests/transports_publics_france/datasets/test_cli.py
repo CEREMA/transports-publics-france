@@ -16,12 +16,18 @@ def test_create_parser():
     assert not input_args.publish
     assert input_args.dry_publish
 
+
 @pytest.fixture
 def mock_command_line(mocker):
     parser = create_parser()
+
     def _mock_command_line(args):
-        mocker.patch("argparse.ArgumentParser.parse_args", return_value=parser.parse_args(args))
+        mocker.patch(
+            "argparse.ArgumentParser.parse_args", return_value=parser.parse_args(args)
+        )
+
     return _mock_command_line
+
 
 def test_main_publish_conflict(mock_command_line):
     mock_command_line(["demo_dataset", "--publish", "API_KEY", "--dry-publish"])
@@ -29,10 +35,13 @@ def test_main_publish_conflict(mock_command_line):
     with pytest.raises(ValueError):
         main()
 
+
 def test_main_publish(mock_command_line, mocker):
     mock_command_line(["demo_dataset", "--publish", "API_KEY"])
 
-    mock = mocker.patch("transports_publics_france.datasets.cli.DatasetManager.update_datagouv_dataset")
+    mock = mocker.patch(
+        "transports_publics_france.datasets.cli.DatasetManager.update_datagouv_dataset"
+    )
 
     main()
 
@@ -42,7 +51,9 @@ def test_main_publish(mock_command_line, mocker):
 def test_main_dry_publish(mock_command_line, mocker):
     mock_command_line(["demo_dataset", "--dry-publish"])
 
-    mock = mocker.patch("transports_publics_france.datasets.cli.DatasetManager.update_datagouv_dataset")
+    mock = mocker.patch(
+        "transports_publics_france.datasets.cli.DatasetManager.update_datagouv_dataset"
+    )
 
     main()
 
