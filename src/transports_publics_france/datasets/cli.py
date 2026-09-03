@@ -64,11 +64,13 @@ def main():
         raise ValueError(f"Dataset key {input_args.dataset} was not found")
 
     # generate datasets resources
-    dataset_manager.generate_dataset_ressources()
+    dataset_manager.generate_dataset_resources()
 
     # publish or dry publish if asked
     if input_args.publish:
-        # dataset_manager.update_resources()
-        pass
+        dataset_manager.authenticate(input_args.publish)
+        dataset_manager.update_datagouv_dataset(dry=False)
     elif input_args.dry_publish:
-        pass
+        dataset_manager.update_datagouv_dataset(dry=True)
+    else:
+        print("No action provided. Use --publish API_KEY or --dry-publish")
