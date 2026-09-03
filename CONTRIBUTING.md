@@ -121,6 +121,6 @@ def _update_datagouv_dataset(self):
         },
   )
 ```
-
-4. Run `uv run generate-dataset MY_DATASET_KEY --dry-publish -v` to test your class without updating the remote dataset. Check that the files generated in the dataset folder fit your expectations
-5. Update this README with your dataset information
+4. Import your class in `src/transports_publics_france/datasets/__init__.py` and add it to the list of dataset classes in the DATASET_KEY_MAPPER declaration.
+5. Run `uv run generate-dataset MY_DATASET_KEY --dry-publish -v` to test your class without updating the remote dataset. Check that the files generated in the dataset folder fit your expectations
+6. Update this README with your dataset information
