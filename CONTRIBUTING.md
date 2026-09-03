@@ -93,14 +93,34 @@ Here are the step to follow if you want to add a new dataset to the list of data
 managed using `transports-publics-france`:
 
 1. Create your dataset and resources in [data.gouv.fr](https://www.data.gouv.fr) using the Cerema organization
-2. Create a new `{key}_dataset.py` file, with `{key}` being your dataset key *in the package*
-3. In this file, define a class that inherits `datasets_publication.utils.DatasetManager`. It must implement all the abstract methods of `DatasetManager` (see example in [demo_dataset.py](demo_dataset.py)):
-   1. `dataset_key`: returns the *dataset key*
-   2. `dataset_id`: returns the *data.gouv.fr* id of the dataset you want to update
-   3. `_generate_dataset_ressources`: **actual code that generates the resources' files**
-   4. `_resources`: returns a list of resource information
-         1. `id`: resource id *in data.gouv.fr*
-         2. `file`: path to resource file
-         3. `payload`: dict containing resource information (see [API doc](https://guides.data.gouv.fr/api-de-data.gouv.fr/reference/datasets?select=par-api#put-datasets-dataset-resources-rid) for available fields)
-4. Run `uv run generate-dataset MY_DATASET_KEY --dry-publish -v` to test your class without updating the remote dataset. Check that the files generated in the dataset folder fit your expectations
-5. Update this README with your dataset information
+2. Create a new python module in `src/transports_publics_france/datasets/`. The module name (without ".py") will be refered as the `dataset_key` and used as identifier in the package.
+3. In this file, define a class that inherits `transports_publics_france.datasets.DatasetManager`. It must implement all the abstract methods of `DatasetManager` (see example in [demo_dataset.py](demo_dataset.py)):
+   2. `dataset_id`: returns the *data.gouv.fr* id of the dataset you want to update. Add the `@classmethod` decorator on top of the signature.
+   3. `_generate_dataset_resources`: **actual code that generates the resources' files**
+   4. `_update_datagouv_dataset`: **code that updates the datagouv dataset**. Use the methods of the parent class to update the dataset:
+```python
+import datetime
+
+def _update_datagouv_dataset(self):
+    # define what to do with the generated files
+    # (they must be in the dataset folder)
+   
+    # add a new resource to the dataset
+    self._add_resource_file(
+        filename="MY_FILE.txt", 
+        title="My resource title", 
+        payload={"description": "My resource description"}
+    )
+   
+    # replace the file of an existing resource
+    self._replace_resource_file(
+        resource_id="c1d3d857-cb33-45a8-ab13-e9d72218486b",
+        filename="MY_FILE.txt",
+        payload={
+            "description": f"Updated the {datetime.datetime.now().isoformat()}"
+        },
+  )
+```
+4. Import your class in `src/transports_publics_france/datasets/__init__.py` and add it to the list of dataset classes in the DATASET_KEY_MAPPER declaration.
+5. Run `uv run generate-dataset MY_DATASET_KEY --dry-publish -v` to test your class without updating the remote dataset. Check that the files generated in the dataset folder fit your expectations
+6. Update this README with your dataset information

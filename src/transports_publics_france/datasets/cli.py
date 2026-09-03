@@ -17,7 +17,7 @@ def create_parser():
         "dataset",
         help="dataset key, in '{key}_dataset.py' ",
         metavar="DATASET_KEY",
-        choices=["demo"],
+        choices=list(DATASET_KEY_MAPPER.keys()),
         type=str,
         action="store",
     )
@@ -31,7 +31,7 @@ def create_parser():
 
     parser.add_argument(
         "--publish",
-        help="publish the generated dataset to data.gouv.fr with the given token, or using the DATAGOUV_API_KEY env variable",
+        help="publish the generated dataset resources to data.gouv.fr with the given token",
         metavar="DATAGOUV_API_KEY",
         action="store",
     )
@@ -60,15 +60,17 @@ def main():
     try:
         dataset_class = DATASET_KEY_MAPPER[input_args.dataset]
         dataset_manager: DatasetManager = dataset_class(verbose=input_args.verbose)
-    except KeyError:
+    except KeyError:  # pragma: no cover
         raise ValueError(f"Dataset key {input_args.dataset} was not found")
 
     # generate datasets resources
-    dataset_manager.generate_dataset_ressources()
+    dataset_manager.generate_dataset_resources()
 
     # publish or dry publish if asked
     if input_args.publish:
-        # dataset_manager.update_resources()
-        pass
+        dataset_manager.authenticate(input_args.publish)
+        dataset_manager.update_datagouv_dataset(dry=False)
     elif input_args.dry_publish:
-        pass
+        dataset_manager.update_datagouv_dataset(dry=True)
+    else:  # pragma: no cover
+        print("No action provided. Use --publish API_KEY or --dry-publish")
