@@ -1,5 +1,5 @@
 from transports_publics_france.datasets.demo_dataset import DemoDataset
-from transports_publics_france.datasets.dataset_manager import get_cerema_organization, CEREMA_ORGANIZATION_ID
+from transports_publics_france.datasets.dataset_manager import get_cerema_organization, CEREMA_ORGANIZATION_ID, DatasetManager
 import datagouv
 import pytest
 
@@ -14,6 +14,10 @@ class TestDataSetManager:
 
         assert instance.verbose
         assert isinstance(instance.datagouv_client, datagouv.Client)
+
+    def test_dataset_key(self):
+        assert DatasetManager.dataset_key() == "dataset_manager"
+        assert DemoDataset.dataset_key() == "demo_dataset"
 
     def test_folder(self, example_instance):
 

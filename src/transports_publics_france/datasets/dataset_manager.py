@@ -44,13 +44,16 @@ class DatasetManager(ABC):
     # dataset key for transports-publics-france identification
 
     @classmethod
-    @abstractmethod
     def dataset_key(cls) -> str:
         """
-        Dataset key as a string.
+        Dataset key (used as identifier in the package).
 
-        :return: dataset key as a string
+        This corresponds to the name of the module in which
+        the dataset class is defined.
+
+        :return: dataset key string
         """
+        return cls.__module__.split(".")[-1]
 
     # datagouv objects
 

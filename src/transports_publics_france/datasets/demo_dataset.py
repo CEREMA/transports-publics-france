@@ -9,7 +9,7 @@ import datetime
 
 class DemoDataset(DatasetManager):
     """
-    Demonstration class that pushes LICENSE.txt to a demo dataset.
+    Demonstration class that pushes the package license to a demo dataset.
     """
     LICENSE_RESOURCE_FILENAME = "LICENSE_RESOURCE.txt"
 
@@ -18,10 +18,6 @@ class DemoDataset(DatasetManager):
         super().__init__(
             environment="demo", verbose=verbose
         )
-
-    @classmethod
-    def dataset_key(cls) -> str:
-        return "demo"
 
     @classmethod
     def dataset_id(cls):
@@ -37,6 +33,6 @@ class DemoDataset(DatasetManager):
             "c1d3d857-cb33-45a8-ab13-e9d72218486b",
             self.LICENSE_RESOURCE_FILENAME,
             payload={
-                "description": f"Updated the {datetime.datetime.now().isoformat()}"
+                "description": f"License file at {datetime.datetime.now().isoformat()}"
             },
         )

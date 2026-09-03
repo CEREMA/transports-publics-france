@@ -31,7 +31,7 @@ def create_parser():
 
     parser.add_argument(
         "--publish",
-        help="publish the generated dataset to data.gouv.fr with the given token, or using the DATAGOUV_API_KEY env variable",
+        help="publish the generated dataset resources to data.gouv.fr with the given token",
         metavar="DATAGOUV_API_KEY",
         action="store",
     )
