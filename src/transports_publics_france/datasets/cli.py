@@ -2,6 +2,8 @@
 Command line interface for generating transports-publics-france datasets and optionally publishing them to data.gouv.fr.
 
 Exposed with uv as `uv run generate-dataset DATASET_KEY`
+
+This module does not correspond to a dataset released and managed by `transports-publics-france`.
 """
 
 import argparse

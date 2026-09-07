@@ -1,5 +1,7 @@
 """
-Utils for data.gouv.fr interaction and dataset management.
+This module contains utils dataset management.
+
+This module does not correspond to a dataset released and managed by `transports-publics-france`.
 """
 
 from abc import ABC, abstractmethod
@@ -16,8 +18,7 @@ class DatasetManager(ABC):
     """
     Generate and manage resources for a specific dataset.
 
-    Subclasses should identify the dataset and its resources,
-    and provide ways to generate and update them.
+    Subclasses should identify the dataset and implement how its resources are generated and updated.
     """
 
     def __init__(self, environment="www", verbose=False):
@@ -132,6 +133,9 @@ class DatasetManager(ABC):
             f"Start updating '{self.dataset_key()}' dataset on datagouv.fr (datagouv id: {self.dataset_id()})"
         )
         self._update_datagouv_dataset()
+        self.log(
+            f"'{self.dataset_key()}' dataset has been successfully updated (datagouv id: {self.dataset_id()})"
+        )
 
     @abstractmethod
     def _update_datagouv_dataset(self):

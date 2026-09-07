@@ -1,0 +1,45 @@
+# Generate dataset resources and publish them (either updating existing resources or creating new ones)
+# Use dry=true to test the generation pipeline without updating the dataset on data.gouv.fr
+
+name: Run the dataset generation pipeline and update its resources on data.gouv.fr
+
+on:
+  workflow_dispatch:
+    inputs:
+      dataset:
+        description: "Key of the updated dataset (see list in src/transports_publics_france/datasets/README.md)"
+        required: true
+        type: choice
+        options:
+          - demo
+      dry:
+        description: "Do a dry update: generate the data but don't actually update the dataset on data.gouv.fr"
+        required: true
+        default: true
+        type: boolean
+
+jobs:
+  dataset_update:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+      - name: Install uv
+        uses: astral-sh/setup-uv@696e4e1bf2f38a7ac027afc72ca9d963427412ae
+        with:
+          enable-cache: true
+          cache-dependency-glob: "uv.lock"
+
+      - name: Set up Python
+        run: uv python install
+
+      - name: Install build dependencies
+        run: uv sync --all-extras
+
+      - name: Run dry dataset update
+        if: ${{ inputs.dry }}
+        run: uv run generate-dataset ${{ inputs.dataset }} --dry-publish --verbose
+
+      - name: Run dataset update
+        if: ${{ !inputs.dry }}
+        run: uv run generate-dataset ${{ inputs.dataset }} --publish ${{ secrets.DATAGOUV_API_KEY }} --verbose
