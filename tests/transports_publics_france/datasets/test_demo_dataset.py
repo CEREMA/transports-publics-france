@@ -33,4 +33,5 @@ class TestDemoDataset:
 
         example_instance._update_datagouv_dataset()
 
+        assert example_instance._dry_update_datagouv
         mock.assert_called_once()
