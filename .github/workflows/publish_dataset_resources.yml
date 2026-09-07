@@ -1,7 +1,7 @@
 # Generate dataset resources and publish them (either updating existing resources or creating new ones)
 # Use dry=true to test the generation pipeline without updating the dataset on data.gouv.fr
 
-name: Run the dataset generation pipeline and update its resources on data.gouv.fr
+name: Dataset update pipeline
 
 on:
   workflow_dispatch:
@@ -17,6 +17,9 @@ on:
         required: true
         default: true
         type: boolean
+
+run-name:
+  Update the '${{ inputs.dataset }}' dataset (dry=${{ inputs.dataset }})
 
 jobs:
   dataset_update:
