@@ -7,11 +7,11 @@ and contains instructions to generate its resources.
 
 ## List of datasets and their generating scripts
 
-### [Jeu de données test](https://demo.data.gouv.fr/datasets/6a75b2fe90f2b13aa640af68/) ([demo_dataset.py](demo_dataset.py)) 
+### [Jeu de données test](https://demo.data.gouv.fr/datasets/6a75b2fe90f2b13aa640af68/) ([demo.py](demo.py)) 
 
 Dataset for demonstrating how to use dataset generation classes.
 
-Publishes the package license to [demo.data.gouv.fr](https://demo.data.gouv.fr).
+Simulates the publication of the package license to [demo.data.gouv.fr](https://demo.data.gouv.fr).
 
 #### Resources
 

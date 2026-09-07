@@ -7,7 +7,7 @@ import shutil
 import datetime
 
 
-class DemoDataset(DatasetManager):
+class Demo(DatasetManager):
     """
     Demonstration class that pushes the package license to a demo dataset.
     """

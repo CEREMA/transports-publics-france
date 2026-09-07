@@ -1,4 +1,4 @@
-from transports_publics_france.datasets.demo_dataset import DemoDataset
+from transports_publics_france.datasets.demo import Demo
 from transports_publics_france.datasets.dataset_manager import (
     get_cerema_organization,
     CEREMA_ORGANIZATION_ID,
@@ -11,18 +11,18 @@ import pytest
 class TestDataSetManager:
 
     @pytest.fixture
-    def example_instance(self) -> DemoDataset:
-        return DemoDataset()
+    def example_instance(self) -> Demo:
+        return Demo()
 
     def test_init(self):
-        instance = DemoDataset(verbose=True)
+        instance = Demo(verbose=True)
 
         assert instance.verbose
         assert isinstance(instance.datagouv_client, datagouv.Client)
 
     def test_dataset_key(self):
         assert DatasetManager.dataset_key() == "dataset_manager"
-        assert DemoDataset.dataset_key() == "demo_dataset"
+        assert Demo.dataset_key() == "demo"
 
     def test_folder(self, example_instance):
 
@@ -34,7 +34,7 @@ class TestDataSetManager:
             "transports_publics_france.datasets.dataset_manager.DatasetManager.create_folder"
         )
         mock2 = mocker.patch(
-            "transports_publics_france.datasets.demo_dataset.DemoDataset._generate_dataset_resources"
+            "transports_publics_france.datasets.demo.Demo._generate_dataset_resources"
         )
 
         example_instance.generate_dataset_resources()
@@ -51,7 +51,7 @@ class TestDataSetManager:
     def test_update_datagouv_dataset(self, example_instance, mocker):
 
         mock = mocker.patch(
-            "transports_publics_france.datasets.demo_dataset.DemoDataset._update_datagouv_dataset"
+            "transports_publics_france.datasets.demo.Demo._update_datagouv_dataset"
         )
 
         example_instance.update_datagouv_dataset(dry=True)
