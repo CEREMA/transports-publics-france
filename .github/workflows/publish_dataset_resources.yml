@@ -19,7 +19,7 @@ on:
         type: boolean
 
 run-name:
-  Update the '${{ inputs.dataset }}' dataset (dry=${{ inputs.dataset }})
+  Update the '${{ inputs.dataset }}' dataset (dry=${{ inputs.dry }})
 
 jobs:
   dataset_update:
