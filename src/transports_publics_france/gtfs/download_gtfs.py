@@ -11,7 +11,6 @@ import polars as pl
 import requests
 
 from transports_publics_france.config import BASE_DIR
-from transports_publics_france.utils.io import make_local_resource_path
 
 log = logging.getLogger(__name__)
 
@@ -28,7 +27,7 @@ def download_resource(
     Download zip file to base_dir/resources_id/gtfs.zip.
     Raises an exception in case of failure (to allow retry in download_resources).
     """
-    destfile = make_local_resource_path(base_dir, resources_id) / "gtfs.zip"
+    destfile = base_dir / str(resources_id) / "gtfs.zip"
     destfile.parent.mkdir(parents=True, exist_ok=True)
 
     if destfile.exists() and not redownload:

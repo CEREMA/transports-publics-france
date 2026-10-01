@@ -1,5 +1,9 @@
 # ignore generated dataset data
 generated_datasets/
+data/
+
+# tests notebook
+nb_test.ipynb
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

@@ -8,8 +8,8 @@ from pathlib import Path
 
 # Paramètres principaux
 RUN_DATE = date.today()
-# RUN_DATE = date(2026, 8, 13) # format (YYYY, M, D)
-REDOWNLOAD = True
+# RUN_DATE = date(2026, 10, 1) # format (YYYY, M, D)
+REDOWNLOAD = False
 
 DAYS_EN = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"]
 DAY_RUN_DATE = DAYS_EN[RUN_DATE.weekday()]
@@ -85,3 +85,5 @@ GTFS_FILES_WANTED = [
     "stop_times.txt", "stops.txt", "routes.txt", "trips.txt",
     "agency.txt", "calendar.txt", "calendars.txt", "calendar_dates.txt",
 ]
+
+MODE_PRIORITY = {"train": 1, "métro": 2, "tramway": 3, "bus": 4, "bus TAD": 4}

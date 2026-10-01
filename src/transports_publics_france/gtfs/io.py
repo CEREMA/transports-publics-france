@@ -15,10 +15,6 @@ import polars as pl
 
 log = logging.getLogger(__name__)
 
-def make_local_resource_path(base_dir: Path, resources_id: str | int) -> Path:
-    """Replicates territoRy::make_local_resource_path() : base_dir / resources_id."""
-    return base_dir / str(resources_id)
-
 
 def extract_gtfs_zip(gtfs_zip_file: Path, files: list[str] | None = None) -> dict:
     """Extract the *.txt files from a GTFS zip file into its parent directory.

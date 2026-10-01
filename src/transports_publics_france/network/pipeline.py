@@ -15,7 +15,9 @@ the following files must exist :
 
 import logging
 import polars as pl
+
 from transports_publics_france.config import RUN_DATE, DATA_DIR
+from transports_publics_france.utils import _flatten_nested_columns
 
 logging.basicConfig(
     level=logging.INFO,
@@ -27,19 +29,19 @@ log = logging.getLogger(__name__)
 DATE_STR = str(RUN_DATE).replace("-", "")
 out_dir = DATA_DIR / "transport.data.gouv.fr"
 
-networks_path = out_dir / f"{DATE_STR}_networks_raw.parquet"
-gtfs_datasets_path = out_dir / f"{DATE_STR}_gtfs_datasets_raw.parquet"
+networks_path = out_dir / f"{DATE_STR}_networks_raw.csv"
+gtfs_datasets_path = out_dir / f"{DATE_STR}_gtfs_datasets_raw.csv"
 
 if not networks_path.exists():
     raise FileNotFoundError(
         f"{networks_path} not found : run gtfs/pipeline.py first for {RUN_DATE}."
     )
 
-networks_df = pl.read_parquet(networks_path)
+networks_df = pl.read_csv(networks_path)
 log.info("networks_df loaded (%d rows).", len(networks_df))
 
 if gtfs_datasets_path.exists():
-    gtfs_datasets = pl.read_parquet(gtfs_datasets_path)
+    gtfs_datasets = pl.read_csv(gtfs_datasets_path)
     log.info("gtfs_datasets loaded (%d rows).", len(gtfs_datasets))
 else:
     log.warning("%s not found, report limited to observed data.", gtfs_datasets_path)
@@ -166,44 +168,11 @@ first_cols = [
 ]
 other_cols = [c for c in gtfs_datasets_info.columns if c not in first_cols]
 gtfs_datasets_info = gtfs_datasets_info.select(first_cols + other_cols)
+gtfs_datasets_info = _flatten_nested_columns(gtfs_datasets_info)
 
 # TODO : normalement tout cela devrait être fait avant dans le pipeline
 
 # Effective save
-out_path = out_dir / f"{DATE_STR}_gtfs_datasets_info.parquet"
-gtfs_datasets_info.write_parquet(out_path)
-log.info("Network report written : %s (%d rows).", out_path, len(gtfs_datasets_info))
-log.info("Columns in the report : %s", gtfs_datasets_info.columns)
-
-
-# Conversion of the nested columns for CSV export
-for col, dtype in zip(gtfs_datasets_info.columns, gtfs_datasets_info.dtypes):
-    if isinstance(dtype, pl.List):
-        inner_dtype = dtype.inner
-
-        if isinstance(inner_dtype, pl.Struct):
-            # List -> JSON
-            gtfs_datasets_info = gtfs_datasets_info.with_columns(
-                pl.col(col)
-                .list.eval(pl.element().struct.json_encode())
-                .list.join(",")
-                .alias(col)
-            )
-        else:
-            # List -> String then concatenate
-            gtfs_datasets_info = gtfs_datasets_info.with_columns(
-                pl.col(col)
-                .list.eval(pl.element().cast(pl.String))
-                .list.join(",")
-                .alias(col)
-            )
-
-    elif isinstance(dtype, pl.Struct):
-        # Simple structure -> JSON
-        gtfs_datasets_info = gtfs_datasets_info.with_columns(
-            pl.col(col).struct.json_encode().alias(col)
-        )
-
 csv_path = out_dir / f"{DATE_STR}_gtfs_datasets_info.csv"
 gtfs_datasets_info.write_csv(csv_path)
 log.info("Network report (CSV) written : %s.", csv_path)
