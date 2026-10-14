@@ -9,7 +9,7 @@ from pathlib import Path
 # Paramètres principaux
 RUN_DATE = date.today()
 # RUN_DATE = date(2026, 10, 1) # format (YYYY, M, D)
-REDOWNLOAD = False
+REDOWNLOAD = True
 
 DAYS_EN = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"]
 DAY_RUN_DATE = DAYS_EN[RUN_DATE.weekday()]
@@ -17,12 +17,11 @@ DAY_RUN_DATE = DAYS_EN[RUN_DATE.weekday()]
 
 # Chemins
 DATA_DIR = Path(os.environ.get("DATA_DIR", Path.cwd() / "data"))
-BASE_DIR = DATA_DIR / "transport.data.gouv.fr" / str(RUN_DATE)
-RAW_DIR = DATA_DIR / "transport.data.gouv.fr" / "raw_tables" / str(RUN_DATE)
-CONSOLIDATED_DIR = DATA_DIR / "transport.data.gouv.fr" / "consolidated" / str(RUN_DATE)
-# TODO : retirer sous-dossier "transport.data.gouv.fr"
+BASE_DIR = DATA_DIR / str(RUN_DATE)
+RAW_DIR = DATA_DIR / "raw_tables" / str(RUN_DATE)
+UNIFIED_DIR = DATA_DIR / "consolidated" / str(RUN_DATE)
 
-for _d in [BASE_DIR, RAW_DIR, CONSOLIDATED_DIR]:
+for _d in [BASE_DIR, RAW_DIR, UNIFIED_DIR]:
     _d.mkdir(parents=True, exist_ok=True)
 
 

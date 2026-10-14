@@ -3,6 +3,7 @@ Input/Output utilities for the transports-publics-france package :
 - make_local_resource_path(base_dir, resources_id)
 - extract_gtfs_zip(gtfs_zip_file, files)
 - read_gtfs_dataset(gtfs_dir, files_to_keep)
+- load_gtfs_tables(dataset_path, files_wanted, files_to_keep)
 """
 
 import logging
@@ -117,3 +118,37 @@ def read_gtfs_dataset(
             log.debug("Impossible to read %s : %s", f.name, e)
 
     return result
+
+
+def load_gtfs_tables(
+    dataset_path: Path,
+    files_wanted: list[str],
+    files_to_keep: list[str],
+) -> dict[str, pl.DataFrame] | None:
+    """Extract the gtfs.zip of a dataset directory and read its tables.
+
+    - extracts the `files_wanted` (*.txt) from dataset_path/gtfs.zip
+    - reads the tables listed in `files_to_keep`
+    - deletes the temporary *.txt files
+    - renames the table "calendars" into "calendar" if needed
+
+    Returns None if the extraction failed.
+    """
+    extraction_res = extract_gtfs_zip(dataset_path / "gtfs.zip", files=files_wanted)
+    if not extraction_res["extracted"]:
+        return None
+
+    tables = read_gtfs_dataset(dataset_path, files_to_keep=files_to_keep)
+
+    # Delete the temporary *.txt files after reading
+    for txt_file in dataset_path.glob("*.txt"):
+        try:
+            txt_file.unlink()
+        except Exception as e:
+            log.debug("Impossible to delete %s : %s", txt_file, e)
+
+    # Alias "calendars" → "calendar"
+    if "calendars" in tables and "calendar" not in tables:
+        tables["calendar"] = tables.pop("calendars")
+
+    return tables

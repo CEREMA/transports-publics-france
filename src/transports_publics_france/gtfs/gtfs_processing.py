@@ -3,13 +3,15 @@ Business logic functions for GTFS data processing :
 - get_active_services(calendar, calendar_dates, run_date, day_run_date)
 - get_parent_station()
 - map_route_type(route_type)
+- prefix_ids(tables, dataset_id)
+- summarize_network(tables, dataset_id, run_date)
 """
 
 import logging
 from datetime import date
 import polars as pl
 
-from transports_publics_france.config import ROUTE_TYPE_MAP
+from transports_publics_france.config import ROUTE_TYPE_MAP, ID_COLS
 
 log = logging.getLogger(__name__)
 
@@ -65,3 +67,88 @@ def map_route_type(rt: str | None) -> str:
     if rt is None:
         return "non renseigné"
     return ROUTE_TYPE_MAP.get(str(rt).strip(), "non renseigné")
+
+
+def prefix_ids(tables: dict[str, pl.DataFrame], dataset_id: str) -> dict[str, pl.DataFrame]:
+    """Prefix the id columns with the dataset_id, so that ids are unique across datasets.
+
+    Returns a new dict, the input dict is left untouched.
+    """
+    prefixed = dict(tables)
+
+    for tbl, cols in ID_COLS.items():
+        if tbl not in prefixed:
+            continue
+        exprs = [
+            (pl.lit(dataset_id + "_") + pl.col(col)).alias(col)
+            for col in cols
+            if col in prefixed[tbl].columns
+        ]
+        if exprs:
+            prefixed[tbl] = prefixed[tbl].with_columns(exprs)
+
+    if "stops" in prefixed and "parent_station" in prefixed["stops"].columns:
+        prefixed["stops"] = prefixed["stops"].with_columns(
+            pl.when(
+                pl.col("parent_station").is_not_null() & (pl.col("parent_station") != "")
+            )
+            .then(pl.lit(dataset_id + "_") + pl.col("parent_station"))
+            .otherwise(pl.col("parent_station"))
+            .alias("parent_station")
+        )
+
+    return prefixed
+
+
+def _is_out_of_period(d: date, dmin, dmax) -> bool:
+    """True if d is outside [dmin, dmax] (or if the period is unknown)."""
+    if dmin is None or dmax is None:
+        return True
+    try:
+        return str(d).replace("-", "") < str(dmin) or str(d).replace("-", "") > str(dmax)
+    except Exception:
+        return True
+
+
+def summarize_network(
+    tables: dict[str, pl.DataFrame],
+    dataset_id: str,
+    run_date: date,
+) -> dict:
+    """Summary of a GTFS dataset : agencies, observed dates, out-of-period flag."""
+    agency_names = None
+    if "agency" in tables and "agency_name" in tables["agency"].columns:
+        agency_names = ", ".join(tables["agency"]["agency_name"].drop_nulls().unique().to_list())
+
+    cal_dates_series: list[str] = []
+    if "calendar_dates" in tables and "date" in tables["calendar_dates"].columns:
+        cal_dates_series = tables["calendar_dates"]["date"].drop_nulls().to_list()
+
+    date_min = date_max = None
+    if "calendar" in tables:
+        cal = tables["calendar"]
+        all_dates = (
+            list(
+                cal.get_column("start_date").drop_nulls().to_list()
+                if "start_date" in cal.columns else []
+            )
+            + list(
+                cal.get_column("end_date").drop_nulls().to_list()
+                if "end_date" in cal.columns else []
+            )
+            + cal_dates_series
+        )
+        if all_dates:
+            date_min = min(all_dates)
+            date_max = max(all_dates)
+    elif cal_dates_series:
+        date_min = min(cal_dates_series)
+        date_max = max(cal_dates_series)
+
+    return {
+        "resources_id": int(dataset_id) if dataset_id.isdigit() else dataset_id,
+        "agency_name": agency_names,
+        "date_min_observed": date_min,
+        "date_max_observed": date_max,
+        "hors_periode": _is_out_of_period(run_date, date_min, date_max),
+    }
