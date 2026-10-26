@@ -1,7 +1,7 @@
 """
 Utils for downloading GTFS resources from transport.data.gouv.fr
-- download_resource(slug, resources_id, resources_url, base_dir, redownload)
-- download_resources(gtfs_datasets, redownload, timeout)
+- download_resource(slug, resources_id, resources_url, base_dir)
+- download_resources(base_dir, gtfs_datasets, timeout)
 """
 
 import logging
@@ -9,8 +9,6 @@ import socket
 from pathlib import Path
 import polars as pl
 import requests
-
-from transports_publics_france.config import BASE_DIR
 
 log = logging.getLogger(__name__)
 
@@ -20,7 +18,6 @@ def download_resource(
     resources_id: str | int,
     resources_url: str,
     base_dir: Path,
-    redownload: bool = False,
 ) -> Path:
     """Replicates territoRy::download_resource().
 
@@ -30,7 +27,7 @@ def download_resource(
     destfile = base_dir / str(resources_id) / "gtfs.zip"
     destfile.parent.mkdir(parents=True, exist_ok=True)
 
-    if destfile.exists() and not redownload:
+    if destfile.exists():
         log.info("File %s already present, skipping.", slug)
         return destfile
 
@@ -44,8 +41,8 @@ def download_resource(
 
 
 def download_resources(
+    base_dir: Path,
     gtfs_datasets: pl.DataFrame,
-    redownload: bool = False,
     timeout: int = 10,
 ) -> pl.DataFrame:
     """Replicates territoRy::download_resources().
@@ -64,14 +61,14 @@ def download_resources(
         original_url = row.get("resources_original_url")
 
         try:
-            destfile = download_resource(slug, rid, url, BASE_DIR, redownload)
+            destfile = download_resource(slug, rid, url, base_dir)
             results.append({"slug": slug, "destfile": str(destfile), "downloaded": True})
         except Exception:
             log.warning(
                 "Failed to download %s from %s. Retrying with original_url...", slug, url
             )
             try:
-                destfile = download_resource(slug, rid, original_url, BASE_DIR, redownload)
+                destfile = download_resource(slug, rid, original_url, base_dir)
                 results.append({"slug": slug, "destfile": str(destfile), "downloaded": True})
             except Exception as e2:
                 log.warning("Definitive failure for %s : %s", slug, e2)

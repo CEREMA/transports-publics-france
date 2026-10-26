@@ -1,5 +1,11 @@
 """
-Construction de la table des arrêts × lignes pour un dataset GTFS.
+Construction de la table des arrêts × lignes pour un dataset GTFS :
+- get_stop_data() : lecture et traitement des tables GTFS
+- _fix_stops(), _fix_routes(), _fix_stop_times(), _fix_agency
+- _fix_routes() : route_short_name = route_long_name si vide
+- ...
+- _build_stops_full() : parent_station + coordonnées
+- _join_all() : stops × stop_times × trips × routes × agency
 """
 
 import logging

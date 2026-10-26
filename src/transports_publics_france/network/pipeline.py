@@ -26,11 +26,16 @@ logging.basicConfig(
 )
 log = logging.getLogger(__name__)
 
-DATE_STR = str(RUN_DATE).replace("-", "")
-out_dir = DATA_DIR / "transport.data.gouv.fr"
+# def run_report():
+# """
+# Fonction englobant tout le script.
+# A priori il n'y a pas besoin de fonction publique intermédiaire car c'est une entité à part entière
+# """
 
-networks_path = out_dir / f"{DATE_STR}_networks_raw.csv"
-gtfs_datasets_path = out_dir / f"{DATE_STR}_gtfs_datasets_raw.csv"
+DATE_STR = str(RUN_DATE).replace("-", "")
+
+networks_path = DATA_DIR / f"{DATE_STR}_networks_raw.csv"
+gtfs_datasets_path = DATA_DIR / f"{DATE_STR}_gtfs_datasets_raw.csv"
 
 if not networks_path.exists():
     raise FileNotFoundError(
@@ -63,6 +68,33 @@ def _offer_id_set(offer_ids: list[int] | None) -> set[int]:
     return set(offer_ids) if offer_ids else set()
 
 
+def _find_agregat(
+            is_agregat: bool | None, offer_ids: list[int] | None,
+            categorie_geo: str | None, agregats_info: list[dict]
+    ) -> tuple[int | None, str | None]:
+    """
+    Returns (resources_id, page_url) of the aggregate, or (None, None).
+    """
+    if is_agregat:
+        return (None, None)  # an aggregate cannot be linked to itself
+
+    offers = _offer_id_set(offer_ids)
+    if not offers:
+        return (None, None)
+
+    geo_rank = GEO_RANK.get(categorie_geo, 99)
+
+    for ag in agregats_info:
+        # the GTFS cannot have a geographic coverage larger than the aggregate
+        if geo_rank > ag["geo_rank"]:
+            continue
+
+        if offers & ag["offer_ids"]:
+            return (ag["resources_id"], ag["page_url"])
+
+    return (None, None)
+
+
 if "is_agregat" in gtfs_datasets_info.columns and "offer_ids" in gtfs_datasets_info.columns:
     agregats_info = [
         {
@@ -79,35 +111,8 @@ if "is_agregat" in gtfs_datasets_info.columns and "offer_ids" in gtfs_datasets_i
         len(agregats_info),
     )
 
-
-    def _find_agregat(
-            is_agregat: bool | None, offer_ids: list[int] | None, categorie_geo: str | None
-    ) -> tuple[int | None, str | None]:
-        """
-        Returns (resources_id, page_url) of the aggregate, or (None, None).
-        """
-        if is_agregat:
-            return (None, None)  # an aggregate cannot be linked to itself
-
-        offers = _offer_id_set(offer_ids)
-        if not offers:
-            return (None, None)
-
-        geo_rank = GEO_RANK.get(categorie_geo, 99)
-
-        for ag in agregats_info:
-            # the GTFS cannot have a geographic coverage larger than the aggregate
-            if geo_rank > ag["geo_rank"]:
-                continue
-
-            if offers & ag["offer_ids"]:
-                return (ag["resources_id"], ag["page_url"])
-
-        return (None, None)
-
-
     matches = [
-        _find_agregat(is_ag, offer_ids, categorie_geo)
+        _find_agregat(is_ag, offer_ids, categorie_geo, agregats_info)
         for is_ag, offer_ids, categorie_geo in zip(
             gtfs_datasets_info["is_agregat"].to_list(),
             gtfs_datasets_info["offer_ids"].to_list(),
@@ -123,15 +128,15 @@ else:
     log.warning("Columns is_agregat/offer_ids missing, regional aggregate matching ignored.")
 
 
-# Save
+# SAVE
 
-# 1) delete columns
+# delete columns
 cols_a_suppr = [
     "slug", "id", "resources_type", "resources_updated", "start_date", "end_date"
 ]
 gtfs_datasets_info = gtfs_datasets_info.drop(cols_a_suppr, strict=False)
 
-# 2) rename columns
+# rename columns
 RENAME_MAP = {
     c: "resource_" + c.removeprefix("resources_")
     for c in gtfs_datasets_info.columns
@@ -173,6 +178,6 @@ gtfs_datasets_info = _flatten_nested_columns(gtfs_datasets_info)
 # TODO : normalement tout cela devrait être fait avant dans le pipeline
 
 # Effective save
-csv_path = out_dir / f"{DATE_STR}_gtfs_datasets_info.csv"
+csv_path = DATA_DIR / f"{DATE_STR}_gtfs_datasets_info.csv"
 gtfs_datasets_info.write_csv(csv_path)
 log.info("Network report (CSV) written : %s.", csv_path)

@@ -2,28 +2,7 @@
 Configuration and parameters for the GTFS France pipeline
 """
 
-import os
-from datetime import date
-from pathlib import Path
-
-# Paramètres principaux
-RUN_DATE = date.today()
-# RUN_DATE = date(2026, 10, 1) # format (YYYY, M, D)
-REDOWNLOAD = True
-
 DAYS_EN = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"]
-DAY_RUN_DATE = DAYS_EN[RUN_DATE.weekday()]
-
-
-# Chemins
-DATA_DIR = Path(os.environ.get("DATA_DIR", Path.cwd() / "data"))
-BASE_DIR = DATA_DIR / str(RUN_DATE)
-RAW_DIR = DATA_DIR / "raw_tables" / str(RUN_DATE)
-UNIFIED_DIR = DATA_DIR / "consolidated" / str(RUN_DATE)
-
-for _d in [BASE_DIR, RAW_DIR, UNIFIED_DIR]:
-    _d.mkdir(parents=True, exist_ok=True)
-
 
 # Mapping route_type GTFS → catégorie
 ROUTE_TYPE_MAP = {
@@ -37,7 +16,7 @@ ROUTE_TYPE_MAP = {
     ]},
 }
 ROUTE_TYPE_PRIORITY = {"train": 1, "métro": 2, "tramway": 3, "bus": 4, "bus TAD": 4}
-# TODO : traduire les modes
+# TODO : traduire les modes ?
 
 # Clean stop names
 STOPWORDS_FR = {
