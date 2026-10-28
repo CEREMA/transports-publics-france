@@ -1,3 +1,3 @@
-from transports_publics_france.network.pipeline import run_report
+from transports_publics_france.network.report import build_network_report
 
-__all__ = ["run_report"]
+__all__ = ["build_network_report"]

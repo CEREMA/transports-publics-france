@@ -23,7 +23,7 @@ from transports_publics_france.utils import _flatten_nested_columns
 
 log = logging.getLogger(__name__)
 
-def run_report(run_date: date, data_dir: Path) -> pl.DataFrame:
+def build_network_report(run_date: date, data_dir: Path) -> pl.DataFrame:
     """
     Fonction englobant tout le script.
     A priori pas besoin de fonction publique intermédiaire car entité à part entière
@@ -185,4 +185,4 @@ if __name__ == "__main__":
         datefmt="%H:%M:%S",
     )
 
-    gtfs_report = run_report(RUN_DATE, DATA_DIR)
+    gtfs_report = build_network_report(RUN_DATE, DATA_DIR)

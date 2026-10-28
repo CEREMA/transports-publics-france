@@ -59,11 +59,6 @@ TABLES_GTFS = [
     "agency", "calendar", "calendar_dates",
 ]
 
-GTFS_FILES_WANTED = [
-    "stop_times.txt", "stops.txt", "routes.txt", "trips.txt",
-    "agency.txt", "calendar.txt", "calendars.txt", "calendar_dates.txt",
-]
-
 MODE_PRIORITY = {"train": 1, "métro": 2, "tramway": 3, "bus": 4, "bus TAD": 4}
 
 # Geographic rank : a GTFS can't have a geographic coverage larger than the aggregate

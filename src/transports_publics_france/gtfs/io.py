@@ -14,6 +14,8 @@ from pathlib import Path
 from io import StringIO
 import polars as pl
 
+from transports_publics_france.config import TABLES_GTFS
+
 log = logging.getLogger(__name__)
 
 
@@ -122,23 +124,31 @@ def read_gtfs_dataset(
 
 def load_gtfs_tables(
     dataset_path: Path,
-    files_wanted: list[str],
-    files_to_keep: list[str],
+    tables: list[str] | None = None,
 ) -> dict[str, pl.DataFrame] | None:
     """Extract the gtfs.zip of a dataset directory and read its tables.
 
-    - extracts the `files_wanted` (*.txt) from dataset_path/gtfs.zip
-    - reads the tables listed in `files_to_keep`
+    - `tables` : names of the tables to read, without extension
+      (default: ["stops", "routes", "trips", "stop_times", "agency", "calendar", "calendar_dates"])
+    - extracts the matching *.txt files from dataset_path/gtfs.zip
     - deletes the temporary *.txt files
     - renames the table "calendars" into "calendar" if needed
 
     Returns None if the extraction failed.
     """
+    tables = list(tables) if tables is not None else list(TABLES_GTFS)
+
+    # "calendars" is a frequent typo for "calendar" in published GTFS
+    if "calendar" in tables and "calendars" not in tables:
+        tables.append("calendars")
+
+    files_wanted = [f"{t}.txt" for t in tables]
+
     extraction_res = extract_gtfs_zip(dataset_path / "gtfs.zip", files=files_wanted)
     if not extraction_res["extracted"]:
         return None
 
-    tables = read_gtfs_dataset(dataset_path, files_to_keep=files_to_keep)
+    result = read_gtfs_dataset(dataset_path, files_to_keep=tables)
 
     # Delete the temporary *.txt files after reading
     for txt_file in dataset_path.glob("*.txt"):
@@ -147,8 +157,8 @@ def load_gtfs_tables(
         except Exception as e:
             log.debug("Impossible to delete %s : %s", txt_file, e)
 
-    # Alias "calendars" → "calendar"
-    if "calendars" in tables and "calendar" not in tables:
-        tables["calendar"] = tables.pop("calendars")
+    # Correction: "calendars" → "calendar"
+    if "calendars" in result and "calendar" not in result:
+        result["calendar"] = result.pop("calendars")
 
-    return tables
+    return result

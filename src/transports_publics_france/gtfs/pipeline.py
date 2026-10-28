@@ -12,7 +12,7 @@ from pathlib import Path
 from datetime import date
 import polars as pl
 
-from transports_publics_france.config import TABLES_GTFS, GTFS_FILES_WANTED, DAYS_EN
+from transports_publics_france.config import DAYS_EN
 
 from transports_publics_france.gtfs.io import load_gtfs_tables
 from transports_publics_france.gtfs.api import get_gtfs_datasets_info
@@ -27,9 +27,9 @@ log = logging.getLogger(__name__)
 
 
 def run_gtfs_pipeline(
-        out_dir: Path, run_date: date = date.today(), redownload: bool = False
+        out_dir: Path, run_date: date = date.today(), redownload: bool = True
     ) -> None:
-    """Download (optional), read, consolidate and compile the GTFS of France."""
+    """Download (optional), read, consolidate and compile every GTFS in France"""
 
     # Create output directories
     base_dir = out_dir / str(run_date) # rather downloaded / date
@@ -141,14 +141,8 @@ def _process_dataset(
     Returns (status, stops, network) : stops and network are None when
     the dataset could not be processed that far.
     """
+    tables = load_gtfs_tables(dataset_path)
     dataset_id = dataset_path.name
-
-    # Tables read from each GTFS ("calendars" is a frequent typo for "calendar")
-    tables_to_read = [*TABLES_GTFS, "calendars"]
-
-    tables = load_gtfs_tables(
-        dataset_path, files_wanted=GTFS_FILES_WANTED, files_to_keep=tables_to_read
-    )
     if tables is None:
         log.warning("Dataset %s : failed extraction, pass.", dataset_id)
         return "failed extract", None, None
