@@ -25,9 +25,6 @@ from transports_publics_france.utils import _flatten_nested_columns
 
 log = logging.getLogger(__name__)
 
-# Tables read from each GTFS ("calendars" is a frequent typo for "calendar")
-TABLES_TO_READ = [*TABLES_GTFS, "calendars"]
-
 
 def run_gtfs_pipeline(
         out_dir: Path, run_date: date = date.today(), redownload: bool = False
@@ -146,8 +143,11 @@ def _process_dataset(
     """
     dataset_id = dataset_path.name
 
+    # Tables read from each GTFS ("calendars" is a frequent typo for "calendar")
+    tables_to_read = [*TABLES_GTFS, "calendars"]
+
     tables = load_gtfs_tables(
-        dataset_path, files_wanted=GTFS_FILES_WANTED, files_to_keep=TABLES_TO_READ
+        dataset_path, files_wanted=GTFS_FILES_WANTED, files_to_keep=tables_to_read
     )
     if tables is None:
         log.warning("Dataset %s : failed extraction, pass.", dataset_id)
@@ -192,6 +192,7 @@ def _persist_report_data(
     if networks_list:
         networks_df = pl.DataFrame(networks_list)
         networks_df = _flatten_nested_columns(networks_df)
+        networks_df = networks_df.with_columns(pl.col(pl.String).str.strip_chars_end())
         networks_df.write_csv(out_dir / f"{date_str}_networks_raw.csv")
         log.info("networks_df persistated (%d rows).", len(networks_df))
     else:
@@ -223,9 +224,9 @@ if __name__ == "__main__":
         datefmt="%H:%M:%S",
     )
 
-    RUN_DATE = date.today()
-    # RUN_DATE = date(2026, 10, 1)     # format = YYYY, M, D
-    REDOWNLOAD = True
+    # RUN_DATE = date.today()
+    RUN_DATE = date(2026, 10, 26)     # format = YYYY, M, D
+    REDOWNLOAD = False
     DATA_DIR = Path(os.environ.get("DATA_DIR", Path.cwd() / "data"))
 
     run_gtfs_pipeline(out_dir=DATA_DIR, run_date=RUN_DATE, redownload=REDOWNLOAD)

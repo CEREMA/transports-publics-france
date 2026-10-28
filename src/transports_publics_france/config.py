@@ -65,3 +65,6 @@ GTFS_FILES_WANTED = [
 ]
 
 MODE_PRIORITY = {"train": 1, "métro": 2, "tramway": 3, "bus": 4, "bus TAD": 4}
+
+# Geographic rank : a GTFS can't have a geographic coverage larger than the aggregate
+GEO_RANK = {"commune": 0, "epci": 1, "departement": 2, "region": 3, "pays": 4}
