@@ -15,11 +15,12 @@ import polars as pl
 
 from transports_publics_france.gtfs.clean_stopnames import reduce_stop_name
 from transports_publics_france.gtfs.gtfs_processing import (
-    get_active_services, get_parent_station, map_route_type
+    get_active_services,
+    get_parent_station,
+    map_route_type,
 )
 
 from transports_publics_france.config import MODE_PRIORITY
-
 
 log = logging.getLogger(__name__)
 
@@ -60,10 +61,14 @@ def get_stop_data(
     try:
         stops_df = tables["stops"].filter(pl.col("stop_id").is_not_null()).unique()
         routes_df = tables["routes"].filter(pl.col("route_id").is_not_null()).unique()
-        trips_df = tables["trips"].filter(
-            pl.col("trip_id").is_not_null() | pl.col("route_id").is_not_null()
-        ).unique()
-        stop_times_df = tables["stop_times"].filter(pl.col("trip_id").is_not_null()).unique()
+        trips_df = (
+            tables["trips"]
+            .filter(pl.col("trip_id").is_not_null() | pl.col("route_id").is_not_null())
+            .unique()
+        )
+        stop_times_df = (
+            tables["stop_times"].filter(pl.col("trip_id").is_not_null()).unique()
+        )
 
         if len(stops_df) == 0:
             log.warning("Dataset %s : no stops, pass.", dataset_id)
@@ -77,8 +82,12 @@ def get_stop_data(
             return None, STATUS_NO_SERVICES
 
         # Only active services
-        trips_df = trips_df.filter(pl.col("service_id").is_in(active_services.to_list()))
-        routes_df = routes_df.filter(pl.col("route_id").is_in(trips_df["route_id"].to_list()))
+        trips_df = trips_df.filter(
+            pl.col("service_id").is_in(active_services.to_list())
+        )
+        routes_df = routes_df.filter(
+            pl.col("route_id").is_in(trips_df["route_id"].to_list())
+        )
 
         # Missing columns / default values
         stops_df = _fix_stops(stops_df)
@@ -86,7 +95,9 @@ def get_stop_data(
         stop_times_df = _fix_stop_times(stop_times_df)
         agency_df = _fix_agency(tables.get("agency", pl.DataFrame()))
         if "agency_id" not in routes_df.columns:
-            routes_df = routes_df.with_columns(pl.lit(agency_df["agency_id"][0]).alias("agency_id"))
+            routes_df = routes_df.with_columns(
+                pl.lit(agency_df["agency_id"][0]).alias("agency_id")
+            )
 
         # Join
         stops_full = _build_stops_full(stops_df)
@@ -122,8 +133,10 @@ def _fix_stops(stops_df: pl.DataFrame) -> pl.DataFrame:
     if "location_type" not in stops_df.columns:
         stops_df = stops_df.with_columns(pl.lit("0").alias("location_type"))
     stops_df = stops_df.with_columns(
-        pl.when(pl.col("location_type") == "").then(pl.lit("0"))
-        .otherwise(pl.col("location_type")).alias("location_type")
+        pl.when(pl.col("location_type") == "")
+        .then(pl.lit("0"))
+        .otherwise(pl.col("location_type"))
+        .alias("location_type")
     )
     if "parent_station" not in stops_df.columns:
         stops_df = stops_df.with_columns(pl.lit("").alias("parent_station"))
@@ -132,9 +145,13 @@ def _fix_stops(stops_df: pl.DataFrame) -> pl.DataFrame:
 
 def _fix_routes(routes_df: pl.DataFrame) -> pl.DataFrame:
     if "route_short_name" not in routes_df.columns:
-        routes_df = routes_df.with_columns(pl.col("route_long_name").alias("route_short_name"))
+        routes_df = routes_df.with_columns(
+            pl.col("route_long_name").alias("route_short_name")
+        )
     elif "route_long_name" not in routes_df.columns:
-        routes_df = routes_df.with_columns(pl.col("route_short_name").alias("route_long_name"))
+        routes_df = routes_df.with_columns(
+            pl.col("route_short_name").alias("route_long_name")
+        )
     # Si route_short_name est vide, on prend route_long_name
     return routes_df.with_columns(
         pl.coalesce(["route_short_name", "route_long_name"]).alias("route_short_name")
@@ -150,11 +167,15 @@ def _fix_stop_times(stop_times_df: pl.DataFrame) -> pl.DataFrame:
 
 def _fix_agency(agency_df: pl.DataFrame) -> pl.DataFrame:
     if len(agency_df) == 0:
-        return pl.DataFrame({"agency_id": [""], "agency_name": [None], "agency_lang": [None]})
+        return pl.DataFrame(
+            {"agency_id": [""], "agency_name": [None], "agency_lang": [None]}
+        )
     if "agency_id" not in agency_df.columns:
         agency_df = agency_df.with_columns(pl.lit("").alias("agency_id"))
     if "agency_lang" not in agency_df.columns:
-        agency_df = agency_df.with_columns(pl.lit(None).cast(pl.Utf8).alias("agency_lang"))
+        agency_df = agency_df.with_columns(
+            pl.lit(None).cast(pl.Utf8).alias("agency_lang")
+        )
     return agency_df
 
 
@@ -187,8 +208,17 @@ def _join_all(
 ) -> pl.DataFrame:
     """stops × stop_times × trips × routes × agency."""
     routes_sel = routes_df.select(
-        [c for c in ["route_id", "route_type", "route_short_name",
-                     "route_long_name", "agency_id"] if c in routes_df.columns]
+        [
+            c
+            for c in [
+                "route_id",
+                "route_type",
+                "route_short_name",
+                "route_long_name",
+                "agency_id",
+            ]
+            if c in routes_df.columns
+        ]
     ).unique()
     routes_sel = routes_sel.with_columns(
         pl.when(pl.col("route_short_name") == "")
@@ -200,24 +230,38 @@ def _join_all(
     trips_sel = trips_df.select(["route_id", "trip_id"]).unique()
 
     st_sel = stop_times_df.select(
-        [c for c in ["trip_id", "stop_id", "stop_sequence",
-                     "arrival_time", "pickup_type", "drop_off_type"]
-         if c in stop_times_df.columns]
+        [
+            c
+            for c in [
+                "trip_id",
+                "stop_id",
+                "stop_sequence",
+                "arrival_time",
+                "pickup_type",
+                "drop_off_type",
+            ]
+            if c in stop_times_df.columns
+        ]
     ).unique()
-    st_sel = st_sel.with_columns([
-        pl.col("pickup_type").fill_null("0"),
-        pl.col("drop_off_type").fill_null("0"),
-    ])
+    st_sel = st_sel.with_columns(
+        [
+            pl.col("pickup_type").fill_null("0"),
+            pl.col("drop_off_type").fill_null("0"),
+        ]
+    )
 
     agency_sel = agency_df.select(
-        [c for c in ["agency_id", "agency_name", "agency_lang"] if c in agency_df.columns]
+        [
+            c
+            for c in ["agency_id", "agency_name", "agency_lang"]
+            if c in agency_df.columns
+        ]
     ).unique()
 
     j1 = stops_full.join(st_sel, on="stop_id", how="inner")
     j2 = j1.join(trips_sel, on="trip_id", how="inner")
-    return (
-        routes_sel.join(agency_sel, on="agency_id", how="left")
-        .join(j2, on="route_id", how="inner")
+    return routes_sel.join(agency_sel, on="agency_id", how="left").join(
+        j2, on="route_id", how="inner"
     )
 
 
@@ -226,14 +270,18 @@ def _join_all(
 # ─────────────────────────────────────────────
 def _flag_on_demand(joined: pl.DataFrame) -> pl.DataFrame:
     """Transport à la demande : ligne_ad (totale) / ligne_ad_partiel."""
-    tad = joined.group_by("route_id").agg([
-        (pl.col("drop_off_type") == "2").all().alias("ligne_ad"),
-        (pl.col("drop_off_type") == "2").any().alias("ligne_ad_partiel"),
-    ])
+    tad = joined.group_by("route_id").agg(
+        [
+            (pl.col("drop_off_type") == "2").all().alias("ligne_ad"),
+            (pl.col("drop_off_type") == "2").any().alias("ligne_ad_partiel"),
+        ]
+    )
     joined = joined.join(tad, on="route_id", how="left")
     return joined.with_columns(
-        pl.when(pl.col("ligne_ad")).then(pl.lit(False))
-        .otherwise(pl.col("ligne_ad_partiel")).alias("ligne_ad_partiel")
+        pl.when(pl.col("ligne_ad"))
+        .then(pl.lit(False))
+        .otherwise(pl.col("ligne_ad_partiel"))
+        .alias("ligne_ad_partiel")
     )
 
 
@@ -242,7 +290,9 @@ def _extract_hour(s: pl.Series) -> pl.Series:
     return s.str.split(":").list.get(0).cast(pl.Int32, strict=False)
 
 
-def _add_peak_frequency(arret_route: pl.DataFrame, joined: pl.DataFrame) -> pl.DataFrame:
+def _add_peak_frequency(
+    arret_route: pl.DataFrame, joined: pl.DataFrame
+) -> pl.DataFrame:
     """Fréquence maximale en heure de pointe du matin (7h-9h) -> freq_ppm_max."""
     if "arrival_time" not in joined.columns:
         return arret_route.with_columns(pl.lit(0).alias("freq_ppm_max"))
@@ -276,7 +326,8 @@ def _add_peak_frequency(arret_route: pl.DataFrame, joined: pl.DataFrame) -> pl.D
 def _add_route_type_and_priority(arret_route: pl.DataFrame) -> pl.DataFrame:
     """Libellé du mode (+ suffixe TAD) et rang de priorité des modes."""
     arret_route = arret_route.with_columns(
-        pl.col("route_type").map_elements(map_route_type, return_dtype=pl.Utf8)
+        pl.col("route_type")
+        .map_elements(map_route_type, return_dtype=pl.Utf8)
         .alias("route_type")
     )
     arret_route = arret_route.with_columns(
@@ -286,15 +337,17 @@ def _add_route_type_and_priority(arret_route: pl.DataFrame) -> pl.DataFrame:
         .alias("route_type")
     )
     return arret_route.with_columns(
-        pl.col("route_type").replace_strict(MODE_PRIORITY, default=999).alias("rang_route_type")
+        pl.col("route_type")
+        .replace_strict(MODE_PRIORITY, default=999)
+        .alias("rang_route_type")
     )
 
 
 def _add_reduced_stop_name(arret_route: pl.DataFrame) -> pl.DataFrame:
     return arret_route.with_columns(
-        pl.col("stop_name").map_elements(
-            lambda x: reduce_stop_name(x) if x else x, return_dtype=pl.Utf8
-        ).alias("stop_name_red")
+        pl.col("stop_name")
+        .map_elements(lambda x: reduce_stop_name(x) if x else x, return_dtype=pl.Utf8)
+        .alias("stop_name_red")
     )
 
 
@@ -305,8 +358,10 @@ def _select_principal_lines(arret_route: pl.DataFrame) -> pl.DataFrame:
         arret_route.select(["route_short_name", "rang_route_type"])
         .unique()
         .with_columns(
-            pl.col("rang_route_type").rank(method="dense")
-            .over(["route_short_name"]).alias("ligne_princ")
+            pl.col("rang_route_type")
+            .rank(method="dense")
+            .over(["route_short_name"])
+            .alias("ligne_princ")
         )
     )
     arret_route = arret_route.join(
@@ -318,17 +373,33 @@ def _select_principal_lines(arret_route: pl.DataFrame) -> pl.DataFrame:
         .first()
     )
 
-    keep_cols = [c for c in [
-        "parent_station", "stop_id", "stop_name", "stop_name_red",
-        "stop_lat", "stop_lon", "route_id", "route_type",
-        "route_short_name", "route_long_name",
-        "agency_id", "agency_name", "agency_lang",
-        "freq_ppm_max", "ligne_ad", "ligne_ad_partiel",
-    ] if c in arret_route_nom_red.columns]
+    keep_cols = [
+        c
+        for c in [
+            "parent_station",
+            "stop_id",
+            "stop_name",
+            "stop_name_red",
+            "stop_lat",
+            "stop_lon",
+            "route_id",
+            "route_type",
+            "route_short_name",
+            "route_long_name",
+            "agency_id",
+            "agency_name",
+            "agency_lang",
+            "freq_ppm_max",
+            "ligne_ad",
+            "ligne_ad_partiel",
+        ]
+        if c in arret_route_nom_red.columns
+    ]
 
     return (
         arret_route_nom_red.select(keep_cols)
-        .drop("stop_id").rename({"parent_station": "stop_id"})
+        .drop("stop_id")
+        .rename({"parent_station": "stop_id"})
     )
 
 
@@ -338,22 +409,30 @@ def _select_principal_lines(arret_route: pl.DataFrame) -> pl.DataFrame:
 def _format_output(
     stations_routes: pl.DataFrame, dataset_id: str, run_date: date
 ) -> pl.DataFrame:
-    processed = stations_routes.with_columns([
-        pl.lit(str(run_date)).alias("date_extraction"),
-        pl.lit(dataset_id).alias("dataset_id"),
-        pl.col("stop_lat").cast(pl.Float64, strict=False).alias("latitude"),
-        pl.col("stop_lon").cast(pl.Float64, strict=False).alias("longitude"),
-    ])
+    processed = stations_routes.with_columns(
+        [
+            pl.lit(str(run_date)).alias("date_extraction"),
+            pl.lit(dataset_id).alias("dataset_id"),
+            pl.col("stop_lat").cast(pl.Float64, strict=False).alias("latitude"),
+            pl.col("stop_lon").cast(pl.Float64, strict=False).alias("longitude"),
+        ]
+    )
     if "stop_lat" in processed.columns:
         processed = processed.drop(["stop_lat", "stop_lon"])
 
     # stop_id_red et route_id_red
-    processed = processed.with_columns([
-        pl.col("stop_id").str.extract(r"(\w+)$")
-        .fill_null(pl.col("stop_name_red")).alias("stop_id_red"),
-        pl.col("route_id").str.extract(r"(\w+)$")
-        .fill_null(pl.col("route_short_name")).alias("route_id_red"),
-    ])
+    processed = processed.with_columns(
+        [
+            pl.col("stop_id")
+            .str.extract(r"(\w+)$")
+            .fill_null(pl.col("stop_name_red"))
+            .alias("stop_id_red"),
+            pl.col("route_id")
+            .str.extract(r"(\w+)$")
+            .fill_null(pl.col("route_short_name"))
+            .alias("route_id_red"),
+        ]
+    )
 
     # Titlecase
     for col in ["stop_name", "route_long_name"]:

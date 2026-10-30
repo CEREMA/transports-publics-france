@@ -33,7 +33,9 @@ def validate_gtfs_tables(
         if missing_cols:
             log.warning(
                 "Dataset %s : required columns missing in %s → %s",
-                dataset_id, tbl, ", ".join(missing_cols)
+                dataset_id,
+                tbl,
+                ", ".join(missing_cols),
             )
             return "invalid schema"
 

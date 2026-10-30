@@ -27,12 +27,12 @@ log = logging.getLogger(__name__)
 
 # TODO : Séparer le pipeline en : build_national_gtfs / build_stops_table ?
 def run_gtfs_pipeline(
-        out_dir: Path, run_date: date = date.today(), redownload: bool = True
-    ) -> None:
+    out_dir: Path, run_date: date = date.today(), redownload: bool = True
+) -> None:
     """Download (optional), read, unify and compile every GTFS in France"""
 
     # Create output directories
-    base_dir = out_dir / str(run_date) # rather downloaded / date
+    base_dir = out_dir / str(run_date)  # rather downloaded / date
     raw_dir = out_dir / "raw_tables" / str(run_date)
     unified_dir = out_dir / "unified" / str(run_date)
     for _dir in [base_dir, raw_dir, unified_dir]:
@@ -43,8 +43,8 @@ def run_gtfs_pipeline(
     gtfs_dirs = _download_and_list_gtfs(base_dir, gtfs_datasets, redownload=redownload)
 
     log.info("=== Read and compilation of GTFS ===")
-    result_extract, networks_list, all_stops_data = (
-        _process_all_datasets(gtfs_dirs, run_date, raw_dir)
+    result_extract, networks_list, all_stops_data = _process_all_datasets(
+        gtfs_dirs, run_date, raw_dir
     )
 
     unify_gtfs_tables(raw_dir, unified_dir)
@@ -63,7 +63,8 @@ def run_gtfs_pipeline(
         log.info("File saved : %s", out_path)
         log.info(
             "Extraction report : %d/%d datasets processed successfully.",
-            nb_success, len(result_extract)
+            nb_success,
+            len(result_extract),
         )
 
 
@@ -84,23 +85,25 @@ def _fetch_metadata(run_date: date) -> pl.DataFrame:
 
 
 def _download_and_list_gtfs(
-        base_dir: Path, gtfs_datasets: pl.DataFrame, redownload: bool
-    ) -> list[Path]:
+    base_dir: Path, gtfs_datasets: pl.DataFrame, redownload: bool
+) -> list[Path]:
     log.info("=== Download / detection of the already downloaded GTFS ===")
 
     if redownload and len(gtfs_datasets) > 0:
         download_resources(base_dir, gtfs_datasets, timeout=20)
 
-    all_dirs = [d for d in base_dir.iterdir() if d.is_dir()] if base_dir.exists() else []
+    all_dirs = (
+        [d for d in base_dir.iterdir() if d.is_dir()] if base_dir.exists() else []
+    )
     gtfs_dirs = [d for d in all_dirs if (d / "gtfs.zip").exists()]
     gtfs_dirs.sort()
     log.info("%d GTFS to process", len(gtfs_dirs))
     return gtfs_dirs
 
 
-def _process_all_datasets(gtfs_dirs: list[Path], run_date: date, raw_dir: Path) -> (
-        tuple[list[dict], list[dict], list[pl.DataFrame]]
-    ):
+def _process_all_datasets(
+    gtfs_dirs: list[Path], run_date: date, raw_dir: Path
+) -> tuple[list[dict], list[dict], list[pl.DataFrame]]:
     """Returns (result_extract, networks_list, all_stops_data)."""
     result_extract: list[dict] = []
     networks_list: list[dict] = []
@@ -111,7 +114,9 @@ def _process_all_datasets(gtfs_dirs: list[Path], run_date: date, raw_dir: Path) 
     print("Run date:", run_date, "Day of the week:", day_run_date)
 
     for i, dataset_path in enumerate(gtfs_dirs, 1):
-        status, stops, network = _process_dataset(dataset_path, run_date, day_run_date, raw_dir)
+        status, stops, network = _process_dataset(
+            dataset_path, run_date, day_run_date, raw_dir
+        )
 
         result_extract.append({"dataset_id": dataset_path.name, "result": status})
         if network:
@@ -120,7 +125,10 @@ def _process_all_datasets(gtfs_dirs: list[Path], run_date: date, raw_dir: Path) 
             all_stops_data.append(stops)
             log.info(
                 "Dataset %s (%d/%d) : %d arrêts traités.",
-                dataset_path.name, i, n_datasets, len(stops)
+                dataset_path.name,
+                i,
+                n_datasets,
+                len(stops),
             )
         gc.collect()
 
@@ -128,8 +136,8 @@ def _process_all_datasets(gtfs_dirs: list[Path], run_date: date, raw_dir: Path) 
 
 
 def _process_dataset(
-        dataset_path: Path, run_date: date, day_run_date: str, raw_dir: Path
-    ) -> tuple[str, pl.DataFrame | None, dict | None]:
+    dataset_path: Path, run_date: date, day_run_date: str, raw_dir: Path
+) -> tuple[str, pl.DataFrame | None, dict | None]:
     """Read, validate and process the GTFS of one dataset directory.
 
     Returns (status, stops, network) : stops and network are None when
@@ -155,21 +163,26 @@ def _process_dataset(
 
 
 def _save_raw_tables(
-        tables: dict[str, pl.DataFrame], dataset_id: str, run_date: date, raw_dir: Path
-    ) -> None:
+    tables: dict[str, pl.DataFrame], dataset_id: str, run_date: date, raw_dir: Path
+) -> None:
     for tbl, df in tables.items():
-        df_out = df.with_columns([
-            pl.lit(dataset_id).alias("dataset_id"),
-            pl.lit(str(run_date)).alias("date_extraction"),
-        ])
+        df_out = df.with_columns(
+            [
+                pl.lit(dataset_id).alias("dataset_id"),
+                pl.lit(str(run_date)).alias("date_extraction"),
+            ]
+        )
         out_dir = raw_dir / tbl
         out_dir.mkdir(parents=True, exist_ok=True)
         df_out.write_parquet(out_dir / f"{dataset_id}.parquet")
 
 
 def _persist_report_data(
-        out_dir: Path, networks_list: list[dict], gtfs_datasets: pl.DataFrame, run_date: date
-    ) -> None:
+    out_dir: Path,
+    networks_list: list[dict],
+    gtfs_datasets: pl.DataFrame,
+    run_date: date,
+) -> None:
     log.info("=== Persisting raw data for the network report ===")
 
     date_str = str(run_date).replace("-", "")
@@ -191,11 +204,14 @@ def _persist_report_data(
         log.warning("gtfs_datasets is empty, nothing to persist for the report.")
 
 
-def _save_results(result_extract: list[dict], run_date: date, out_dir: Path, name: str) -> None:
+def _save_results(
+    result_extract: list[dict], run_date: date, out_dir: Path, name: str
+) -> None:
     log.info("=== Saving results ===")
 
     result_df = (
-        pl.DataFrame(result_extract) if result_extract
+        pl.DataFrame(result_extract)
+        if result_extract
         else pl.DataFrame({"dataset_id": [], "result": []})
     )
     date_str = str(run_date).replace("-", "")
@@ -210,7 +226,7 @@ if __name__ == "__main__":
     )
 
     # RUN_DATE = date.today()
-    RUN_DATE = date(2026, 10, 26)     # format = YYYY, M, D
+    RUN_DATE = date(2026, 10, 26)  # format = YYYY, M, D
     REDOWNLOAD = False
     DATA_DIR = Path(os.environ.get("DATA_DIR", Path.cwd() / "data"))
 

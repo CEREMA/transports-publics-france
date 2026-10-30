@@ -15,6 +15,7 @@ from transports_publics_france.config import ROUTE_TYPE_MAP, ID_COLS
 
 log = logging.getLogger(__name__)
 
+
 def get_active_services(
     calendar: pl.DataFrame | None,
     calendar_dates: pl.DataFrame | None,
@@ -53,9 +54,7 @@ def get_parent_station(stops: pl.DataFrame) -> pl.DataFrame:
     if "parent_station" not in stops.columns:
         return stops.with_columns(pl.col("stop_id").alias("parent_station"))
     return stops.with_columns(
-        pl.when(
-            pl.col("parent_station").is_null() | (pl.col("parent_station") == "")
-        )
+        pl.when(pl.col("parent_station").is_null() | (pl.col("parent_station") == ""))
         .then(pl.col("stop_id"))
         .otherwise(pl.col("parent_station"))
         .alias("parent_station")
@@ -69,7 +68,9 @@ def map_route_type(rt: str | None) -> str:
     return ROUTE_TYPE_MAP.get(str(rt).strip(), "non renseigné")
 
 
-def prefix_ids(tables: dict[str, pl.DataFrame], dataset_id: str) -> dict[str, pl.DataFrame]:
+def prefix_ids(
+    tables: dict[str, pl.DataFrame], dataset_id: str
+) -> dict[str, pl.DataFrame]:
     """Prefix the id columns with the dataset_id, so that ids are unique across datasets.
 
     Returns a new dict, the input dict is left untouched.
@@ -90,7 +91,8 @@ def prefix_ids(tables: dict[str, pl.DataFrame], dataset_id: str) -> dict[str, pl
     if "stops" in prefixed and "parent_station" in prefixed["stops"].columns:
         prefixed["stops"] = prefixed["stops"].with_columns(
             pl.when(
-                pl.col("parent_station").is_not_null() & (pl.col("parent_station") != "")
+                pl.col("parent_station").is_not_null()
+                & (pl.col("parent_station") != "")
             )
             .then(pl.lit(dataset_id + "_") + pl.col("parent_station"))
             .otherwise(pl.col("parent_station"))
@@ -105,7 +107,9 @@ def _is_out_of_period(d: date, dmin, dmax) -> bool:
     if dmin is None or dmax is None:
         return True
     try:
-        return str(d).replace("-", "") < str(dmin) or str(d).replace("-", "") > str(dmax)
+        return str(d).replace("-", "") < str(dmin) or str(d).replace("-", "") > str(
+            dmax
+        )
     except Exception:
         return True
 
@@ -118,7 +122,9 @@ def summarize_network(
     """Summary of a GTFS dataset : agencies, observed dates, out-of-period flag."""
     agency_names = None
     if "agency" in tables and "agency_name" in tables["agency"].columns:
-        agency_names = ", ".join(tables["agency"]["agency_name"].drop_nulls().unique().to_list())
+        agency_names = ", ".join(
+            tables["agency"]["agency_name"].drop_nulls().unique().to_list()
+        )
 
     cal_dates_series: list[str] = []
     if "calendar_dates" in tables and "date" in tables["calendar_dates"].columns:
@@ -130,11 +136,13 @@ def summarize_network(
         all_dates = (
             list(
                 cal.get_column("start_date").drop_nulls().to_list()
-                if "start_date" in cal.columns else []
+                if "start_date" in cal.columns
+                else []
             )
             + list(
                 cal.get_column("end_date").drop_nulls().to_list()
-                if "end_date" in cal.columns else []
+                if "end_date" in cal.columns
+                else []
             )
             + cal_dates_series
         )

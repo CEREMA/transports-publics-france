@@ -9,6 +9,7 @@ import requests
 
 log = logging.getLogger(__name__)
 
+
 def get_gtfs_datasets_info() -> pl.DataFrame:
     """Interrogates the transport.data.gouv.fr API and returns GTFS metadata.
 
@@ -38,10 +39,14 @@ def get_gtfs_datasets_info() -> pl.DataFrame:
         # get aggregate containing this dataset
         offers_raw = item.get("offers") or []
         offer_ids = [
-            o.get("identifiant_offre") for o in offers_raw if o.get("identifiant_offre") is not None
+            o.get("identifiant_offre")
+            for o in offers_raw
+            if o.get("identifiant_offre") is not None
         ]
         offer_names = [
-            o.get("nom_commercial", "").strip() for o in offers_raw if o.get("nom_commercial")
+            o.get("nom_commercial", "").strip()
+            for o in offers_raw
+            if o.get("nom_commercial")
         ]
 
         for _, res in enumerate(item.get("resources") or []):
@@ -59,38 +64,42 @@ def get_gtfs_datasets_info() -> pl.DataFrame:
             else:
                 seen_datagouv_ids.append(datagouv_id)
 
-            rows.append({
-                "id": item.get("id"),
-                "datagouv_id": item.get("datagouv_id"),
-                "title": item.get("title"),
-                "slug": item.get("slug"),
-                "page_url": item.get("page_url"),
-                "publisher_name": publisher.get("name"),
-                "resources_id": res.get("id"),
-                "resources_datagouv_id": datagouv_id,
-                "resources_title": res.get("title"),
-                "resources_type": res.get("type"),
-                "resources_updated": res.get("updated"),
-                "resources_url": res.get("url"),
-                "resources_original_url": res.get("original_url"),
-                "resources_page_url": res.get("page_url"),
-                "resources_community_resource_publisher": res.get("community_resource_publisher"),
-                "resources_features": res.get("features"),
-                "resources_modes": res.get("modes"),
-                "start_date": metadata.get("start_date"),
-                "end_date": metadata.get("end_date"),
-                "stops_count": metadata.get("stops_count"),
-                "categorie_geo": categorie_geo,
-                "covered_area": covered_area,
-                "is_scolaire": any(st == "school" for st in sub_types),
-                "is_saisonnier": any(st == "seasonal" for st in sub_types),
-                "is_agregat": any(t == "agrégat_region" for t in tags_list),
-                "offer_ids": offer_ids,
-                "offer_names": offer_names,
-                "legal_owners": item.get("legal_owners"),
-                "created_at": item.get("created_at"),
-                "updated": item.get("updated"),
-            })
+            rows.append(
+                {
+                    "id": item.get("id"),
+                    "datagouv_id": item.get("datagouv_id"),
+                    "title": item.get("title"),
+                    "slug": item.get("slug"),
+                    "page_url": item.get("page_url"),
+                    "publisher_name": publisher.get("name"),
+                    "resources_id": res.get("id"),
+                    "resources_datagouv_id": datagouv_id,
+                    "resources_title": res.get("title"),
+                    "resources_type": res.get("type"),
+                    "resources_updated": res.get("updated"),
+                    "resources_url": res.get("url"),
+                    "resources_original_url": res.get("original_url"),
+                    "resources_page_url": res.get("page_url"),
+                    "resources_community_resource_publisher": res.get(
+                        "community_resource_publisher"
+                    ),
+                    "resources_features": res.get("features"),
+                    "resources_modes": res.get("modes"),
+                    "start_date": metadata.get("start_date"),
+                    "end_date": metadata.get("end_date"),
+                    "stops_count": metadata.get("stops_count"),
+                    "categorie_geo": categorie_geo,
+                    "covered_area": covered_area,
+                    "is_scolaire": any(st == "school" for st in sub_types),
+                    "is_saisonnier": any(st == "seasonal" for st in sub_types),
+                    "is_agregat": any(t == "agrégat_region" for t in tags_list),
+                    "offer_ids": offer_ids,
+                    "offer_names": offer_names,
+                    "legal_owners": item.get("legal_owners"),
+                    "created_at": item.get("created_at"),
+                    "updated": item.get("updated"),
+                }
+            )
             # TODO : mettre resources au singulier, traduire en anglais
 
     if duplicates:

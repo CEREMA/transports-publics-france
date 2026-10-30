@@ -21,8 +21,11 @@ def compile_all_stops(all_stops_data: list[pl.DataFrame]) -> pl.DataFrame:
     """
     if all_stops_data:
         all_stops_data = [
-            df.with_columns(pl.col("freq_ppm_max").cast(pl.Int64))
-            if "freq_ppm_max" in df.columns else df
+            (
+                df.with_columns(pl.col("freq_ppm_max").cast(pl.Int64))
+                if "freq_ppm_max" in df.columns
+                else df
+            )
             for df in all_stops_data
         ]
         all_stops = pl.concat(all_stops_data, how="diagonal")
@@ -38,7 +41,8 @@ def compile_all_stops(all_stops_data: list[pl.DataFrame]) -> pl.DataFrame:
 
         if "agency_lang" in all_stops.columns:
             all_stops = all_stops.with_columns(
-                pl.col("agency_lang").str.to_uppercase()
+                pl.col("agency_lang")
+                .str.to_uppercase()
                 .str.replace("^$", None)
                 .str.replace("FR-FR", "FR")
                 .alias("agency_lang")
@@ -60,10 +64,20 @@ def compile_all_stops(all_stops_data: list[pl.DataFrame]) -> pl.DataFrame:
                 )
 
         # Final deduplication
-        sort_col = "freq_ppm_max" if "freq_ppm_max" in all_stops.columns else all_stops.columns[0]
+        sort_col = (
+            "freq_ppm_max"
+            if "freq_ppm_max" in all_stops.columns
+            else all_stops.columns[0]
+        )
 
         for group_cols in [
-            ["stop_name_red", "route_short_name", "route_type", "latitude", "longitude"],
+            [
+                "stop_name_red",
+                "route_short_name",
+                "route_type",
+                "latitude",
+                "longitude",
+            ],
             ["stop_id", "stop_name_red", "route_id", "agency_id"],
         ]:
             valid_group = [c for c in group_cols if c in all_stops.columns]
@@ -76,14 +90,23 @@ def compile_all_stops(all_stops_data: list[pl.DataFrame]) -> pl.DataFrame:
 
         # Final deduplication by rounded coordinates
         if "latitude" in all_stops.columns and "longitude" in all_stops.columns:
-            all_stops = all_stops.with_columns([
-                pl.col("latitude").round(3).alias("arrond_lat"),
-                pl.col("longitude").round(3).alias("arrond_lon"),
-            ])
+            all_stops = all_stops.with_columns(
+                [
+                    pl.col("latitude").round(3).alias("arrond_lat"),
+                    pl.col("longitude").round(3).alias("arrond_lon"),
+                ]
+            )
             group_rnd = [
-                c for c in ["stop_name_red", "route_short_name",
-                            "route_type", "arrond_lat", "arrond_lon"]
-                if c in all_stops.columns]
+                c
+                for c in [
+                    "stop_name_red",
+                    "route_short_name",
+                    "route_type",
+                    "arrond_lat",
+                    "arrond_lon",
+                ]
+                if c in all_stops.columns
+            ]
             if group_rnd and sort_col in all_stops.columns:
                 all_stops = (
                     all_stops.sort(sort_col, descending=True)

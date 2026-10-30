@@ -7,11 +7,13 @@ and contains instructions to generate its resources.
 
 ## List of datasets and their generating scripts
 
-### [Jeu de données test](https://demo.data.gouv.fr/datasets/6a75b2fe90f2b13aa640af68/) ([demo_dataset.py](demo_dataset.py)) 
+### [Network report](https://demo.data.gouv.fr/datasets/6a75b2fe90f2b13aa640af68/) ([report.py](report.py)) 
 
-Dataset for demonstrating how to use dataset generation classes.
+One row per GTFS resource referenced on transport.data.gouv.fr, with declarative metadata, metadata observed in the GTFS files, and the regional aggregate containing each network, if any.
 
-Publishes the package license to [demo.data.gouv.fr](https://demo.data.gouv.fr).
+Documentation of the fields: [network_report.md](network_report.md)
+
+When the dataset will be available on data.gouv.fr, it will be [here](https://demo.data.gouv.fr).
 
 #### Resources
 

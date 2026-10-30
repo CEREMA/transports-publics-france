@@ -62,14 +62,20 @@ def download_resources(
 
         try:
             destfile = download_resource(slug, rid, url, base_dir)
-            results.append({"slug": slug, "destfile": str(destfile), "downloaded": True})
+            results.append(
+                {"slug": slug, "destfile": str(destfile), "downloaded": True}
+            )
         except Exception:
             log.warning(
-                "Failed to download %s from %s. Retrying with original_url...", slug, url
+                "Failed to download %s from %s. Retrying with original_url...",
+                slug,
+                url,
             )
             try:
                 destfile = download_resource(slug, rid, original_url, base_dir)
-                results.append({"slug": slug, "destfile": str(destfile), "downloaded": True})
+                results.append(
+                    {"slug": slug, "destfile": str(destfile), "downloaded": True}
+                )
             except Exception as e2:
                 log.warning("Definitive failure for %s : %s", slug, e2)
                 results.append({"slug": slug, "destfile": None, "downloaded": False})
@@ -77,5 +83,7 @@ def download_resources(
     dl_df = pl.DataFrame(results)
     failed = dl_df.filter(~pl.col("downloaded"))
     if len(failed) > 0:
-        log.warning("Resources not downloaded : %s", ", ".join(failed["slug"].to_list()))
+        log.warning(
+            "Resources not downloaded : %s", ", ".join(failed["slug"].to_list())
+        )
     return dl_df

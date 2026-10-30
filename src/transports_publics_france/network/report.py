@@ -23,6 +23,7 @@ from transports_publics_france.utils import _flatten_nested_columns
 
 log = logging.getLogger(__name__)
 
+
 def build_network_report(run_date: date, data_dir: Path) -> pl.DataFrame:
     """
     Fonction englobant tout le script.
@@ -46,15 +47,22 @@ def build_network_report(run_date: date, data_dir: Path) -> pl.DataFrame:
         gtfs_datasets = pl.read_csv(gtfs_datasets_path)
         log.info("gtfs_datasets loaded (%d rows).", len(gtfs_datasets))
     else:
-        log.warning("%s not found, report limited to observed data.", gtfs_datasets_path)
+        log.warning(
+            "%s not found, report limited to observed data.", gtfs_datasets_path
+        )
         gtfs_datasets = pl.DataFrame()
 
     if len(gtfs_datasets) > 0 and "resources_id" in gtfs_datasets.columns:
-        gtfs_datasets_info = gtfs_datasets.join(networks_df, on="resources_id", how="left")
+        gtfs_datasets_info = gtfs_datasets.join(
+            networks_df, on="resources_id", how="left"
+        )
     else:
         gtfs_datasets_info = networks_df
 
-    if "is_agregat" in gtfs_datasets_info.columns and "offer_ids" in gtfs_datasets_info.columns:
+    if (
+        "is_agregat" in gtfs_datasets_info.columns
+        and "offer_ids" in gtfs_datasets_info.columns
+    ):
         agregats_info = [
             {
                 "resources_id": row["resources_id"],
@@ -62,7 +70,9 @@ def build_network_report(run_date: date, data_dir: Path) -> pl.DataFrame:
                 "offer_ids": _offer_id_set(row["offer_ids"]),
                 "geo_rank": GEO_RANK.get(row.get("categorie_geo"), 99),
             }
-            for row in gtfs_datasets_info.filter(pl.col("is_agregat")).iter_rows(named=True)
+            for row in gtfs_datasets_info.filter(pl.col("is_agregat")).iter_rows(
+                named=True
+            )
             if _offer_id_set(row["offer_ids"])
         ]
         log.info(
@@ -78,17 +88,26 @@ def build_network_report(run_date: date, data_dir: Path) -> pl.DataFrame:
                 gtfs_datasets_info["categorie_geo"].to_list(),
             )
         ]
-        gtfs_datasets_info = gtfs_datasets_info.with_columns([
-            pl.Series("agregat_resources_id", [m[0] for m in matches]),
-        ])
+        gtfs_datasets_info = gtfs_datasets_info.with_columns(
+            [
+                pl.Series("agregat_resources_id", [m[0] for m in matches]),
+            ]
+        )
         nb_matches = sum(1 for m in matches if m[0] is not None)
         log.info("%d individual GTFS(s) connected to a regional aggregate.", nb_matches)
     else:
-        log.warning("Columns is_agregat/offer_ids missing, regional aggregate matching ignored.")
+        log.warning(
+            "Columns is_agregat/offer_ids missing, regional aggregate matching ignored."
+        )
 
     # delete columns
     cols_a_suppr = [
-        "slug", "id", "resources_type", "resources_updated", "start_date", "end_date"
+        "slug",
+        "id",
+        "resources_type",
+        "resources_updated",
+        "start_date",
+        "end_date",
     ]
     gtfs_datasets_info = gtfs_datasets_info.drop(cols_a_suppr, strict=False)
 
@@ -98,14 +117,18 @@ def build_network_report(run_date: date, data_dir: Path) -> pl.DataFrame:
         for c in gtfs_datasets_info.columns
         if c.startswith("resources_")
     }
-    rename_map.update({
-        "datagouv_id": "dataset_id",
-        "resources_id": "resource_transport_id",
-        "title": "dataset_title",
-        "date_min_observed": "start_date",
-        "date_max_observed": "end_date",
-    })
-    rename_map = {k: v for k, v in rename_map.items() if k in gtfs_datasets_info.columns}
+    rename_map.update(
+        {
+            "datagouv_id": "dataset_id",
+            "resources_id": "resource_transport_id",
+            "title": "dataset_title",
+            "date_min_observed": "start_date",
+            "date_max_observed": "end_date",
+        }
+    )
+    rename_map = {
+        k: v for k, v in rename_map.items() if k in gtfs_datasets_info.columns
+    }
     gtfs_datasets_info = gtfs_datasets_info.rename(rename_map)
 
     if "hors_periode" in gtfs_datasets_info.columns:
@@ -116,15 +139,23 @@ def build_network_report(run_date: date, data_dir: Path) -> pl.DataFrame:
     # reformat dates (YYYYMMDD -> JJ/MM/YYYY)
     for c in ("start_date", "end_date"):
         gtfs_datasets_info = gtfs_datasets_info.with_columns(
-            pl.col(c).cast(pl.String).str.strip_chars()
-            .str.strptime(pl.Date, "%Y%m%d", strict=False).dt.strftime("%d/%m/%Y")
+            pl.col(c)
+            .cast(pl.String)
+            .str.strip_chars()
+            .str.strptime(pl.Date, "%Y%m%d", strict=False)
+            .dt.strftime("%d/%m/%Y")
             .alias(c)
         )
 
     # reorganization : ids, then titles, then urls, for the first columns
     cols_id = ["dataset_id", "resource_transport_id", "resource_datagouv_id"]
     cols_title = ["dataset_title", "resource_title"]
-    cols_url = ["page_url", "resource_url", "resource_original_url", "resource_page_url"]
+    cols_url = [
+        "page_url",
+        "resource_url",
+        "resource_original_url",
+        "resource_page_url",
+    ]
 
     first_cols = [
         c for c in cols_id + cols_title + cols_url if c in gtfs_datasets_info.columns
@@ -148,9 +179,11 @@ def _offer_id_set(offer_ids: list[int] | None) -> set[int]:
 
 
 def _find_agregat(
-            is_agregat: bool | None, offer_ids: list[int] | None,
-            categorie_geo: str | None, agregats_info: list[dict]
-    ) -> tuple[int | None, str | None]:
+    is_agregat: bool | None,
+    offer_ids: list[int] | None,
+    categorie_geo: str | None,
+    agregats_info: list[dict],
+) -> tuple[int | None, str | None]:
     """
     Returns (resources_id, page_url) of the aggregate, or (None, None).
     """
@@ -176,7 +209,7 @@ def _find_agregat(
 
 if __name__ == "__main__":
     # RUN_DATE = date.today()
-    RUN_DATE = date(2026, 10, 26)     # format = YYYY, M, D
+    RUN_DATE = date(2026, 10, 26)  # format = YYYY, M, D
     DATA_DIR = Path(os.environ.get("DATA_DIR", Path.cwd() / "data"))
 
     logging.basicConfig(

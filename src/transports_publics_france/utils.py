@@ -4,6 +4,7 @@ Utility functions useful everywhere
 
 import polars as pl
 
+
 def _flatten_nested_columns(df: pl.DataFrame) -> pl.DataFrame:
     """Convert List / Struct cols to String for CSV export."""
     for col, dtype in df.schema.items():
@@ -18,9 +19,7 @@ def _flatten_nested_columns(df: pl.DataFrame) -> pl.DataFrame:
             else:
                 # List[scalaire] -> String, separated by ","
                 expr = (
-                    pl.col(col)
-                    .list.eval(pl.element().cast(pl.String))
-                    .list.join(",")
+                    pl.col(col).list.eval(pl.element().cast(pl.String)).list.join(",")
                 )
             df = df.with_columns(expr.alias(col))
         elif isinstance(dtype, pl.Struct):
