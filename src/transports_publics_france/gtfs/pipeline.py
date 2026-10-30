@@ -2,7 +2,6 @@
 Pipeline for downloading and processing the GTFS data
 
 Public function : run_gtfs_pipeline()
-Can also be run as a script : python -m transports_publics_france.gtfs.pipeline
 """
 
 import os
@@ -26,15 +25,16 @@ from transports_publics_france.utils import _flatten_nested_columns
 log = logging.getLogger(__name__)
 
 
+# TODO : Séparer le pipeline en : build_national_gtfs / build_stops_table ?
 def run_gtfs_pipeline(
         out_dir: Path, run_date: date = date.today(), redownload: bool = True
     ) -> None:
-    """Download (optional), read, consolidate and compile every GTFS in France"""
+    """Download (optional), read, unify and compile every GTFS in France"""
 
     # Create output directories
     base_dir = out_dir / str(run_date) # rather downloaded / date
     raw_dir = out_dir / "raw_tables" / str(run_date)
-    unified_dir = out_dir / "consolidated" / str(run_date)
+    unified_dir = out_dir / "unified" / str(run_date)
     for _dir in [base_dir, raw_dir, unified_dir]:
         _dir.mkdir(parents=True, exist_ok=True)
 
@@ -50,7 +50,7 @@ def run_gtfs_pipeline(
     unify_gtfs_tables(raw_dir, unified_dir)
 
     _persist_report_data(out_dir, networks_list, gtfs_datasets, run_date)
-    _save_results(result_extract, run_date, out_dir)
+    _save_results(result_extract, run_date, out_dir, name="resultats_extraction")
 
     all_stops = compile_all_stops(all_stops_data)
     if len(all_stops) > 0:
@@ -67,9 +67,6 @@ def run_gtfs_pipeline(
         )
 
 
-# ─────────────────────────────────────────────
-# Metadata recuperation, download
-# ─────────────────────────────────────────────
 def _fetch_metadata(run_date: date) -> pl.DataFrame:
     log.info("=== GTFS metadata recuperation ===")
 
@@ -101,9 +98,6 @@ def _download_and_list_gtfs(
     return gtfs_dirs
 
 
-# ─────────────────────────────────────────────
-# Read and compilation
-# ─────────────────────────────────────────────
 def _process_all_datasets(gtfs_dirs: list[Path], run_date: date, raw_dir: Path) -> (
         tuple[list[dict], list[dict], list[pl.DataFrame]]
     ):
@@ -173,9 +167,6 @@ def _save_raw_tables(
         df_out.write_parquet(out_dir / f"{dataset_id}.parquet")
 
 
-# ─────────────────────────────────────────────
-# Persisting raw data for the report, saving results
-# ─────────────────────────────────────────────
 def _persist_report_data(
         out_dir: Path, networks_list: list[dict], gtfs_datasets: pl.DataFrame, run_date: date
     ) -> None:
@@ -200,7 +191,7 @@ def _persist_report_data(
         log.warning("gtfs_datasets is empty, nothing to persist for the report.")
 
 
-def _save_results(result_extract: list[dict], run_date: date, out_dir: Path) -> None:
+def _save_results(result_extract: list[dict], run_date: date, out_dir: Path, name: str) -> None:
     log.info("=== Saving results ===")
 
     result_df = (
@@ -208,7 +199,7 @@ def _save_results(result_extract: list[dict], run_date: date, out_dir: Path) -> 
         else pl.DataFrame({"dataset_id": [], "result": []})
     )
     date_str = str(run_date).replace("-", "")
-    result_df.write_csv(out_dir / f"{date_str}_resultats_extraction.csv")
+    result_df.write_csv(out_dir / f"{date_str}_{name}.csv")
 
 
 if __name__ == "__main__":
