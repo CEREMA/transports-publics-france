@@ -7,13 +7,13 @@ and contains instructions to generate its resources.
 
 ## List of datasets and their generating scripts
 
-### [Network report](https://demo.data.gouv.fr/datasets/6a75b2fe90f2b13aa640af68/) ([report.py](report.py)) 
+### [Network report](https://www.data.gouv.fr/admin/datasets/6a97e28ffcf92f8247d2ef0b) ([report.py](report.py)) 
 
 One row per GTFS resource referenced on transport.data.gouv.fr, with declarative metadata, metadata observed in the GTFS files, and the regional aggregate containing each network, if any.
 
-Documentation of the fields: [network_report.md](network_report.md)
+Documentation of the fields: [gtfs_datasets_info.md](gtfs_datasets_info.md)
 
-When the dataset will be available on data.gouv.fr, it will be [here](https://demo.data.gouv.fr).
+When the dataset will be available on data.gouv.fr, it will be [here](https://www.data.gouv.fr/admin/datasets/6a97e28ffcf92f8247d2ef0b).
 
 #### Resources
 
