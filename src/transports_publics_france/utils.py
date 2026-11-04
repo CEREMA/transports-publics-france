@@ -2,6 +2,7 @@
 Utility functions useful everywhere
 """
 
+import importlib.metadata
 import polars as pl
 
 
@@ -26,3 +27,11 @@ def _flatten_nested_columns(df: pl.DataFrame) -> pl.DataFrame:
             # Struct -> JSON
             df = df.with_columns(pl.col(col).struct.json_encode().alias(col))
     return df
+
+
+def get_package_version() -> str:
+    """
+    Get the version of transports-publics-france.
+    :return: Version in SemVer format (major.minor.patch)
+    """
+    return importlib.metadata.version("transports-publics-france")
