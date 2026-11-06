@@ -17,6 +17,16 @@ When the dataset will be available on data.gouv.fr, it will be [here](https://ww
 
 #### Resources
 
+- TODO
+
+### Demo dataset ([demo.py](demo.py)) 
+
+Dataset for demonstrating how datasets are published in the `transports-public-france` package.
+
+Dry publishes the package license to [demo.data.gouv.fr](https://demo.data.gouv.fr).
+
+#### Resources
+
 - license.txt: the package license
 
 ## Run the generation of dataset resources
@@ -24,11 +34,11 @@ When the dataset will be available on data.gouv.fr, it will be [here](https://ww
 Run this command to generate resources for the dataset corresponding to the key
 
 ```bash
-# DATASET_KEY is the prefix in `{key}_dataset.py`
+# DATASET_KEY is the prefix in `{key}.py`
 uv run generate-dataset DATASET_KEY
 ```
 
-Publication to [demo.data.gouv.fr](https://demo.data.gouv.fr) can be simulated with the following command
+Publication to [data.gouv.fr](https://data.gouv.fr) can be simulated with the following command
 
 ```bash
 uv run generate-dataset DATASET_KEY --dry-publish
@@ -40,7 +50,7 @@ _This action is only available for the repository maintainers and owners of an a
 
 ### GitHub action
 
-Prefer using the `TODO` GitHub action.
+Prefer using the `Dataset update pipeline_` GitHub action.
 If you are authorized, you can trigger it from the `Actions` tab of GitHub.
 
 ### Running the update locally
