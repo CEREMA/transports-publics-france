@@ -93,8 +93,8 @@ Here are the step to follow if you want to add a new dataset to the list of data
 managed using `transports-publics-france`:
 
 1. Create your dataset and resources in [data.gouv.fr](https://www.data.gouv.fr) using the Cerema organization
-2. Create a new python module in [src/transports_publics_france/datasets/](src/transports_publics_france/datasets/). The module name (without ".py") will be refered as the `dataset_key` and used as identifier in the package.
-3. In this file, define a class that inherits `transports_publics_france.datasets.DatasetManager`. It must implement all the abstract methods of `DatasetManager` (see example in [demo.py](demo.py)):
+2. Create a new python module in [src/transports_publics_france/datasets/](src/transports_publics_france/datasets/). The module name (without ".py") will be refered as the `dataset_key` and used as identifier in the package. Choose an explicit filename.
+3. In this file, define a class that inherits `transports_publics_france.datasets.DatasetManager`. It must implement all the abstract methods of `DatasetManager` (see example in [demo.py](src/transports_publics_france/datasets/demo.py)):
    2. `dataset_id`: returns the *data.gouv.fr* id of the dataset you want to update. Add the `@classmethod` decorator on top of the signature.
    3. `_generate_dataset_resources`: **actual code that generates the resources' files**. Files should be generated in the dataset folder (use the `DatasetManager.folder` property)
    4. `_update_datagouv_dataset`: **code that updates the datagouv dataset**. Use the methods of the parent class to update the dataset:
