@@ -64,7 +64,10 @@ class TestDataSetManager:
         dataset = datagouv.Dataset("DATASET_ID", fetch=False)
         resource = datagouv.Resource("RESOURCE_ID", dataset_id="...", fetch=False)
         fake_full_payload = {"fake": "payload"}
-        mock_dataset = mocker.patch("transports_publics_france.datasets.dataset_manager.datagouv.Client.dataset", return_value=dataset)
+        mock_dataset = mocker.patch(
+            "transports_publics_france.datasets.dataset_manager.datagouv.Client.dataset",
+            return_value=dataset,
+        )
         mock_prepare_payload = mocker.patch(
             "transports_publics_france.datasets.dataset_manager.DatasetManager._prepare_resource_update",
             return_value=("filepath", fake_full_payload),
