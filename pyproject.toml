@@ -3,11 +3,13 @@ name = "transports-publics-france"
 # x-release-please-start-version
 version = "0.1.0"
 # x-release-please-end
-description = "TODO"
+description = "This repository contains code related to the processing and analysis of data related to french public transports. The package functions are also used to generate datasets on [data.gouv.fr](https://data.gouv.fr)."
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
     "datagouv-client>=0.5.0",
+    "polars>=2.1.0",
+    "requests>=2.34.2",
 ]
 
 [dependency-groups]

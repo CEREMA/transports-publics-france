@@ -17,7 +17,7 @@ def create_parser():
 
     parser.add_argument(
         "dataset",
-        help="dataset key, in '{key}_dataset.py' ",
+        help="dataset key, in '{key}.py' ",
         metavar="DATASET_KEY",
         choices=list(DATASET_KEY_MAPPER.keys()),
         type=str,
