@@ -7,8 +7,8 @@ we rely on the "offers" from the transport.data.gouv.fr API.
 
 Requires running gtfs/pipeline.py first, for the given run_date (see config.py),
 the following files must exist :
-    - {date}_networks_raw.parquet
-    - {date}_gtfs_datasets_raw.parquet
+    - {date}_networks_raw.csv
+    - {date}_gtfs_datasets_raw.csv
 """
 
 import logging
