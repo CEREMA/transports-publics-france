@@ -7,7 +7,7 @@ and contains instructions to generate its resources.
 
 ## List of datasets and their generating scripts
 
-### [Network report](https://www.data.gouv.fr/admin/datasets/6a97e28ffcf92f8247d2ef0b) ([report.py](report.py)) 
+### [Network report](https://www.data.gouv.fr/admin/datasets/6a97e28ffcf92f8247d2ef0b) ([gtfs_resource_list.py](gtfs_resource_list.py)) 
 
 One row per GTFS resource referenced on transport.data.gouv.fr, with declarative metadata, metadata observed in the GTFS files, and the regional aggregate containing each network, if any.
 
@@ -50,7 +50,7 @@ _This action is only available for the repository maintainers and owners of an a
 
 ### GitHub action
 
-Prefer using the `Dataset update pipeline_` GitHub action.
+Prefer using the `Dataset update pipeline` GitHub action.
 If you are authorized, you can trigger it from the `Actions` tab of GitHub.
 
 ### Running the update locally
