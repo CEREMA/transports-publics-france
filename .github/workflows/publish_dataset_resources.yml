@@ -12,6 +12,7 @@ on:
         type: choice
         options:
           - demo
+          - gtfs_resource_list
       dry:
         description: "Do a dry update: generate the data but don't actually update the dataset on data.gouv.fr"
         required: true
