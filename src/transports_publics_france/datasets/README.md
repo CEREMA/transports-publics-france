@@ -11,7 +11,7 @@ and contains instructions to generate its resources.
 
 One row per GTFS resource referenced on transport.data.gouv.fr, with declarative metadata, metadata observed in the GTFS files, and the regional aggregate containing each network, if any.
 
-Documentation of the fields: [gtfs_datasets_info.md](gtfs_datasets_info.md)
+Documentation of the fields: [gtfs_resource_list.md](gtfs_resource_list.md)
 
 When the dataset will be available on data.gouv.fr, it will be [here](https://www.data.gouv.fr/admin/datasets/6a97e28ffcf92f8247d2ef0b).
 

@@ -100,6 +100,22 @@ def build_network_report(run_date: date, data_dir: Path) -> pl.DataFrame:
             "Columns is_agregat/offer_ids missing, regional aggregate matching ignored."
         )
 
+    # adding an extraction_status column
+    extraction_path = data_dir / f"{date_str}_resultats_extraction.csv"
+    extraction = (
+        pl.read_csv(extraction_path)
+        .with_columns(
+            pl.col("dataset_id").cast(pl.Int64, strict=False).alias("resources_id")
+        )
+        .select("resources_id", pl.col("result").alias("extraction_status"))
+    )
+    gtfs_resource_list = gtfs_resource_list.join(
+        extraction, on="resources_id", how="left"
+    )
+    gtfs_resource_list = gtfs_resource_list.with_columns(
+        pl.col("extraction_status").fill_null("not downloaded")
+    )
+
     # delete columns
     cols_a_suppr = [
         "slug",
