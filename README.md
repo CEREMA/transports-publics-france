@@ -4,6 +4,10 @@ This repository contains code related to the processing and analysis of data rel
 
 The package functions are also used to generate datasets on [data.gouv.fr](https://data.gouv.fr).
 
+## Documentation
+
+The detailed documentation is available in the [project wiki](https://github.com/CEREMA/transports-publics-france/wiki).
+
 ## Usage
 
 `transports-publics-france` can be used as a Python package or as a script to generate datasets.

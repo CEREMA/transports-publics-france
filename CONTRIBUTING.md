@@ -87,7 +87,9 @@ pytest [-v]
 
 Tests are automatically run when making a PR on gitHub
 
-## Adding a new dataset to `transports-publics-france`
+## Publishing a new dataset to `data.gouv.fr`
+
+This feature is made for Cerema. The average user won't need it.
 
 Here are the step to follow if you want to add a new dataset to the list of datasets
 managed using `transports-publics-france`:

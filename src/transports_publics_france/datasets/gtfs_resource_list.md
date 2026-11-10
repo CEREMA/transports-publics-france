@@ -1,4 +1,4 @@
-# Rapport par réseau (`gtfs_datasets_info`)
+# Rapport par réseau (`gtfs_resource_list`)
 
 ## Objectif
 
@@ -9,7 +9,7 @@ Le rapport par réseau liste l'ensemble des jeux de données GTFS référencés 
 - les **métadonnées observées** directement dans les fichiers GTFS téléchargés (agences, dates de validité du calendrier) ;
 - un **rapprochement automatique** entre chaque GTFS individuel et l'agrégat régional qui le contient éventuellement (par exemple un réseau urbain intégré dans le GTFS agrégé de sa région), à partir des identifiants d'offres de transport de l'API (`offer_ids`).
 
-Il est produit par `build_network_report(run_date, data_dir)`, à lancer **après** `run_gtfs_pipeline` pour la même date et dans le même dossier. La fonction écrit `AAAAMMJJ_gtfs_datasets_info.csv` dans `data_dir` et renvoie également le tableau sous forme de DataFrame.
+Il est produit par `build_network_report(run_date, data_dir)`, à lancer **après** `run_gtfs_pipeline` pour la même date et dans le même dossier. La fonction écrit `AAAAMMJJ_gtfs_resource_list.csv` dans `data_dir` et renvoie également le tableau sous forme de DataFrame.
 
 ```python
 from datetime import date

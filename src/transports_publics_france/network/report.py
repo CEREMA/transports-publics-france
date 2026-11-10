@@ -1,11 +1,11 @@
 """
-Creation of the network report (gtfs_datasets_info)
+Creation of the network report (gtfs_resource_list)
 from raw data persisted by gtfs/pipeline.py.
 
 To link an individual GTFS to the regional aggregate it belongs to,
 we rely on the "offers" from the transport.data.gouv.fr API.
 
-Requires running gtfs/pipeline.py first, for the given run_date (see config.py),
+Requires running gtfs/pipeline.py first, for the same given run_date,
 the following files must exist :
     - {date}_networks_raw.csv
     - {date}_gtfs_datasets_raw.csv
@@ -53,15 +53,15 @@ def build_network_report(run_date: date, data_dir: Path) -> pl.DataFrame:
         gtfs_datasets = pl.DataFrame()
 
     if len(gtfs_datasets) > 0 and "resources_id" in gtfs_datasets.columns:
-        gtfs_datasets_info = gtfs_datasets.join(
+        gtfs_resource_list = gtfs_datasets.join(
             networks_df, on="resources_id", how="left"
         )
     else:
-        gtfs_datasets_info = networks_df
+        gtfs_resource_list = networks_df
 
     if (
-        "is_agregat" in gtfs_datasets_info.columns
-        and "offer_ids" in gtfs_datasets_info.columns
+        "is_agregat" in gtfs_resource_list.columns
+        and "offer_ids" in gtfs_resource_list.columns
     ):
         agregats_info = [
             {
@@ -70,7 +70,7 @@ def build_network_report(run_date: date, data_dir: Path) -> pl.DataFrame:
                 "offer_ids": _offer_id_set(row["offer_ids"]),
                 "geo_rank": GEO_RANK.get(row.get("categorie_geo"), 99),
             }
-            for row in gtfs_datasets_info.filter(pl.col("is_agregat")).iter_rows(
+            for row in gtfs_resource_list.filter(pl.col("is_agregat")).iter_rows(
                 named=True
             )
             if _offer_id_set(row["offer_ids"])
@@ -83,12 +83,12 @@ def build_network_report(run_date: date, data_dir: Path) -> pl.DataFrame:
         matches = [
             _find_agregat(is_ag, offer_ids, categorie_geo, agregats_info)
             for is_ag, offer_ids, categorie_geo in zip(
-                gtfs_datasets_info["is_agregat"].to_list(),
-                gtfs_datasets_info["offer_ids"].to_list(),
-                gtfs_datasets_info["categorie_geo"].to_list(),
+                gtfs_resource_list["is_agregat"].to_list(),
+                gtfs_resource_list["offer_ids"].to_list(),
+                gtfs_resource_list["categorie_geo"].to_list(),
             )
         ]
-        gtfs_datasets_info = gtfs_datasets_info.with_columns(
+        gtfs_resource_list = gtfs_resource_list.with_columns(
             [
                 pl.Series("agregat_resources_id", [m[0] for m in matches]),
             ]
@@ -109,12 +109,12 @@ def build_network_report(run_date: date, data_dir: Path) -> pl.DataFrame:
         "start_date",
         "end_date",
     ]
-    gtfs_datasets_info = gtfs_datasets_info.drop(cols_a_suppr, strict=False)
+    gtfs_resource_list = gtfs_resource_list.drop(cols_a_suppr, strict=False)
 
     # rename columns
     rename_map = {
         c: "resource_" + c.removeprefix("resources_")
-        for c in gtfs_datasets_info.columns
+        for c in gtfs_resource_list.columns
         if c.startswith("resources_")
     }
     rename_map.update(
@@ -127,18 +127,18 @@ def build_network_report(run_date: date, data_dir: Path) -> pl.DataFrame:
         }
     )
     rename_map = {
-        k: v for k, v in rename_map.items() if k in gtfs_datasets_info.columns
+        k: v for k, v in rename_map.items() if k in gtfs_resource_list.columns
     }
-    gtfs_datasets_info = gtfs_datasets_info.rename(rename_map)
+    gtfs_resource_list = gtfs_resource_list.rename(rename_map)
 
-    if "hors_periode" in gtfs_datasets_info.columns:
-        gtfs_datasets_info = gtfs_datasets_info.with_columns(
+    if "hors_periode" in gtfs_resource_list.columns:
+        gtfs_resource_list = gtfs_resource_list.with_columns(
             pl.col("hors_periode").not_().alias("service_dates_valid")
         ).drop("hors_periode")
 
     # reformat dates (YYYYMMDD -> JJ/MM/YYYY)
     for c in ("start_date", "end_date"):
-        gtfs_datasets_info = gtfs_datasets_info.with_columns(
+        gtfs_resource_list = gtfs_resource_list.with_columns(
             pl.col(c)
             .cast(pl.String)
             .str.strip_chars()
@@ -158,20 +158,20 @@ def build_network_report(run_date: date, data_dir: Path) -> pl.DataFrame:
     ]
 
     first_cols = [
-        c for c in cols_id + cols_title + cols_url if c in gtfs_datasets_info.columns
+        c for c in cols_id + cols_title + cols_url if c in gtfs_resource_list.columns
     ]
-    other_cols = [c for c in gtfs_datasets_info.columns if c not in first_cols]
-    gtfs_datasets_info = gtfs_datasets_info.select(first_cols + other_cols)
-    gtfs_datasets_info = _flatten_nested_columns(gtfs_datasets_info)
+    other_cols = [c for c in gtfs_resource_list.columns if c not in first_cols]
+    gtfs_resource_list = gtfs_resource_list.select(first_cols + other_cols)
+    gtfs_resource_list = _flatten_nested_columns(gtfs_resource_list)
 
     # TODO : should be done earlier in the pipeline, but for now we do it here
 
     # Effective save
-    csv_path = data_dir / f"{date_str}_gtfs_datasets_info.csv"
-    gtfs_datasets_info.write_csv(csv_path)
+    csv_path = data_dir / f"{date_str}_gtfs_resource_list.csv"
+    gtfs_resource_list.write_csv(csv_path)
     log.info("Network report (CSV) written : %s.", csv_path)
 
-    return gtfs_datasets_info
+    return gtfs_resource_list
 
 
 def _offer_id_set(offer_ids: list[int] | None) -> set[int]:

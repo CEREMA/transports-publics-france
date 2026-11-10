@@ -1,10 +1,10 @@
 """
-Network report dataset (gtfs_datasets_info).
+Network report dataset (gtfs_resource_list).
 
 Generates the report with the GTFS pipeline + `build_network_report`,
 then publishes it as a resource of the dataset on data.gouv.fr.
 
-Fields documentation: gtfs_datasets_info.md
+Fields documentation: gtfs_resource_list.md
 """
 
 import datetime
@@ -30,7 +30,7 @@ class GtfsDatasetsInfo(DatasetManager):
     @property
     def report_filename(self) -> str:
         """Return the filename of the report."""
-        return f"{self.run_date.strftime('%Y%m%d')}_gtfs_datasets_info.csv"
+        return f"{self.run_date.strftime('%Y%m%d')}_gtfs_resource_list.csv"
 
     @classmethod
     def dataset_id(cls) -> str:

@@ -1,6 +1,6 @@
 from transports_publics_france.datasets.dataset_manager import DatasetManager
 from transports_publics_france.datasets.demo import Demo
-from transports_publics_france.datasets.gtfs_datasets_info import GtfsDatasetsInfo
+from transports_publics_france.datasets.gtfs_resource_list import GtfsDatasetsInfo
 
 # { dataset_key: dataset_class } mapper
 DATASET_KEY_MAPPER = {
