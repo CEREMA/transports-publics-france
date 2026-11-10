@@ -17,7 +17,7 @@ When the dataset will be available on data.gouv.fr, it will be [here](https://ww
 
 #### Resources
 
-- TODO
+- YYYYMMDD_gtfs_resource_list.csv: list of GTFS datasets referenced on [transport.data.gouv.fr](https://transport.data.gouv.fr)
 
 ### Demo dataset ([demo.py](demo.py)) 
 
