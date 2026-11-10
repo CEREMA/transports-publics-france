@@ -61,8 +61,13 @@ class TestDataSetManager:
 
     def test_add_resource_file(self, example_instance, mocker):
         example_instance._dry_update_datagouv = False
+        dataset = datagouv.Dataset("DATASET_ID", fetch=False)
         resource = datagouv.Resource("RESOURCE_ID", dataset_id="...", fetch=False)
         fake_full_payload = {"fake": "payload"}
+        mock_dataset = mocker.patch(
+            "transports_publics_france.datasets.dataset_manager.datagouv.Client.dataset",
+            return_value=dataset,
+        )
         mock_prepare_payload = mocker.patch(
             "transports_publics_france.datasets.dataset_manager.DatasetManager._prepare_resource_update",
             return_value=("filepath", fake_full_payload),
@@ -82,6 +87,7 @@ class TestDataSetManager:
         )
         assert resource_id == "RESOURCE_ID"
         mock_create_static.assert_called_with("filepath", fake_full_payload)
+        mock_dataset.assert_called_with(example_instance.dataset_id())
 
     def test_replace_resource_file(self, example_instance, mocker):
         example_instance._dry_update_datagouv = False

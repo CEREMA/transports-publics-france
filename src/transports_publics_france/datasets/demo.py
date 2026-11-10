@@ -20,7 +20,7 @@ class Demo(DatasetManager):
 
     @classmethod
     def dataset_id(cls):
-        return "6a75b2fe90f2b13aa640af68"
+        return "demo_dataset_id"
 
     def _generate_dataset_resources(self):
         # copy LICENSE.txt to dataset folder
@@ -34,7 +34,7 @@ class Demo(DatasetManager):
 
         # replace the file of the relevant resource
         self._replace_resource_file(
-            "c1d3d857-cb33-45a8-ab13-e9d72218486b",
+            "demo_resource_id",
             self.LICENSE_RESOURCE_FILENAME,
             payload={
                 "description": f"License file at {datetime.datetime.now().isoformat()}"

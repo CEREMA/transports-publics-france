@@ -1,8 +1,8 @@
-from transports_publics_france.utils import generic
+from transports_publics_france.utils import get_package_version
 
 
 def test_get_package_version():
-    version = generic.get_package_version()
+    version = get_package_version()
 
     split = version.split(".")
 

@@ -12,7 +12,7 @@ class TestDemo:
         assert example_instance._client_environment == "demo"
 
     def test_dataset_id(self):
-        assert Demo.dataset_id() == "6a75b2fe90f2b13aa640af68"
+        assert Demo.dataset_id() == "demo_dataset_id"
 
     def test__generate_dataset_resources(self, example_instance, mocker):
         mock = mocker.patch("transports_publics_france.datasets.demo.shutil.copyfile")

@@ -2,16 +2,28 @@
 
 `transports-publics-france` contains code to generate several datasets available on the Cerema organisation of [data.gouv.fr](https://www.data.gouv.fr/organizations/cerema/datasets).
 
-Each `{key}_dataset.py` is related to a specific dataset 
+Each `{key}.py` is related to a specific dataset 
 and contains instructions to generate its resources.
 
 ## List of datasets and their generating scripts
 
-### [Jeu de données test](https://demo.data.gouv.fr/datasets/6a75b2fe90f2b13aa640af68/) ([demo.py](demo.py)) 
+### [Network report](https://www.data.gouv.fr/admin/datasets/6a97e28ffcf92f8247d2ef0b) ([report.py](report.py)) 
 
-Dataset for demonstrating how to use dataset generation classes.
+One row per GTFS resource referenced on transport.data.gouv.fr, with declarative metadata, metadata observed in the GTFS files, and the regional aggregate containing each network, if any.
 
-Simulates the publication of the package license to [demo.data.gouv.fr](https://demo.data.gouv.fr).
+Documentation of the fields: [gtfs_resource_list.md](gtfs_resource_list.md)
+
+When the dataset will be available on data.gouv.fr, it will be [here](https://www.data.gouv.fr/admin/datasets/6a97e28ffcf92f8247d2ef0b).
+
+#### Resources
+
+- TODO
+
+### Demo dataset ([demo.py](demo.py)) 
+
+Dataset for demonstrating how datasets are published in the `transports-public-france` package.
+
+Dry publishes the package license to [demo.data.gouv.fr](https://demo.data.gouv.fr).
 
 #### Resources
 
@@ -22,11 +34,11 @@ Simulates the publication of the package license to [demo.data.gouv.fr](https://
 Run this command to generate resources for the dataset corresponding to the key
 
 ```bash
-# DATASET_KEY is the prefix in `{key}_dataset.py`
+# DATASET_KEY is the prefix in `{key}.py`
 uv run generate-dataset DATASET_KEY
 ```
 
-Publication to [demo.data.gouv.fr](https://demo.data.gouv.fr) can be simulated with the following command
+Publication to [data.gouv.fr](https://data.gouv.fr) can be simulated with the following command
 
 ```bash
 uv run generate-dataset DATASET_KEY --dry-publish
@@ -38,7 +50,7 @@ _This action is only available for the repository maintainers and owners of an a
 
 ### GitHub action
 
-Prefer using the `TODO` GitHub action.
+Prefer using the `Dataset update pipeline_` GitHub action.
 If you are authorized, you can trigger it from the `Actions` tab of GitHub.
 
 ### Running the update locally

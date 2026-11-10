@@ -2,8 +2,11 @@
 
 This repository contains code related to the processing and analysis of data related to french public transports.
 
-TODO (mention the division between the python package and the dataset generation scripts)
+The package functions are also used to generate datasets on [data.gouv.fr](https://data.gouv.fr).
 
+## Documentation
+
+The detailed documentation is available in the [project wiki](https://github.com/CEREMA/transports-publics-france/wiki).
 
 ## Usage
 
