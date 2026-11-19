@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.1](https://github.com/CEREMA/transports-publics-france/compare/v0.2.0...v0.2.1) (2026-11-19)
+
+
+### Documentation
+
+* documentation fixes ([#14](https://github.com/CEREMA/transports-publics-france/issues/14)) ([a507bd7](https://github.com/CEREMA/transports-publics-france/commit/a507bd7d416715d6f913733bab1fee2f1a3a9bc2))
+
 ## [0.2.0](https://github.com/CEREMA/transports-publics-france/compare/v0.1.0...v0.2.0) (2026-11-10)
 
 
