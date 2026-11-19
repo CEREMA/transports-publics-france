@@ -14,7 +14,7 @@ The detailed documentation is available in the [project wiki](https://github.com
 
 ### Using as a package
 
-The `transports-publics-france` package will soon be available on PyPi and can be installed with
+The `transports-publics-france` package is available on PyPi and can be installed with
 
 ```bash
 # using uv
@@ -29,15 +29,15 @@ pip install transports-publics-france
 `transports-publics-france` contains the source code used to generate the resources
 of [several opendata datasets](src/transports_publics_france/datasets/README.md).
 
-You can reproduce this generation process by running the following command
+You can reproduce this generation process by running the `generate-dataset` command that comes with the package:
 
 ```bash
 # DATASET_KEY is the prefix in `{key}_dataset.py`
-uv run generate-dataset DATASET_KEY
+generate-dataset DATASET_KEY
 ```
 
 For detailed help on the command arguments, run
 
 ```bash
-uv run generate-dataset -h
+generate-dataset -h
 ```

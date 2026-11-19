@@ -7,13 +7,11 @@ and contains instructions to generate its resources.
 
 ## List of datasets and their generating scripts
 
-### [Network report](https://www.data.gouv.fr/admin/datasets/6a97e28ffcf92f8247d2ef0b) ([gtfs_resource_list.py](gtfs_resource_list.py)) 
+### [Network report](https://www.data.gouv.fr/datasets/6a97e28ffcf92f8247d2ef0b) ([gtfs_resource_list.py](gtfs_resource_list.py)) 
 
 One row per GTFS resource referenced on transport.data.gouv.fr, with declarative metadata, metadata observed in the GTFS files, and the regional aggregate containing each network, if any.
 
 Documentation of the fields: [gtfs_resource_list.md](gtfs_resource_list.md)
-
-When the dataset will be available on data.gouv.fr, it will be [here](https://www.data.gouv.fr/admin/datasets/6a97e28ffcf92f8247d2ef0b).
 
 #### Resources
 
@@ -35,13 +33,13 @@ Run this command to generate resources for the dataset corresponding to the key
 
 ```bash
 # DATASET_KEY is the prefix in `{key}.py`
-uv run generate-dataset DATASET_KEY
+generate-dataset DATASET_KEY
 ```
 
 Publication to [data.gouv.fr](https://data.gouv.fr) can be simulated with the following command
 
 ```bash
-uv run generate-dataset DATASET_KEY --dry-publish
+generate-dataset DATASET_KEY --dry-publish
 ```
 
 ## Updating the datasets on data.gouv.fr
@@ -58,7 +56,7 @@ If you are authorized, you can trigger it from the `Actions` tab of GitHub.
 You will need an authorized API key. Then, run 
 
 ```bash
-uv run generate-dataset DATASET_KEY --publish DATAGOUV_API_KEY
+generate-dataset DATASET_KEY --publish DATAGOUV_API_KEY
 ```
 
 ## Adding new datasets to `transports-publics-france`
