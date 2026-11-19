@@ -33,13 +33,13 @@ Run this command to generate resources for the dataset corresponding to the key
 
 ```bash
 # DATASET_KEY is the prefix in `{key}.py`
-uv run generate-dataset DATASET_KEY
+generate-dataset DATASET_KEY
 ```
 
 Publication to [data.gouv.fr](https://data.gouv.fr) can be simulated with the following command
 
 ```bash
-uv run generate-dataset DATASET_KEY --dry-publish
+generate-dataset DATASET_KEY --dry-publish
 ```
 
 ## Updating the datasets on data.gouv.fr
@@ -56,7 +56,7 @@ If you are authorized, you can trigger it from the `Actions` tab of GitHub.
 You will need an authorized API key. Then, run 
 
 ```bash
-uv run generate-dataset DATASET_KEY --publish DATAGOUV_API_KEY
+generate-dataset DATASET_KEY --publish DATAGOUV_API_KEY
 ```
 
 ## Adding new datasets to `transports-publics-france`
