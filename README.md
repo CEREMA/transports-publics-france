@@ -14,7 +14,7 @@ The detailed documentation is available in the [project wiki](https://github.com
 
 ### Using as a package
 
-The `transports-publics-france` package will soon be available on PyPi and can be installed with
+The `transports-publics-france` package is available on PyPi and can be installed with
 
 ```bash
 # using uv
