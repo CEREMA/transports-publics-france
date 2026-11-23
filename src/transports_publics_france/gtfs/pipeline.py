@@ -108,7 +108,7 @@ def _process_all_datasets(
     n_datasets = len(gtfs_dirs)
 
     day_run_date = DAYS_EN[run_date.weekday()]
-    print("Run date:", run_date, "Day of the week:", day_run_date)
+    logger.info(f"Run date: {run_date}, Day of the week: {day_run_date}")
 
     for i, dataset_path in enumerate(gtfs_dirs, 1):
         status, stops, network = _process_dataset(

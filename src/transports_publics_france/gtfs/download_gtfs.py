@@ -27,7 +27,7 @@ def download_resource(
     destfile.parent.mkdir(parents=True, exist_ok=True)
 
     if destfile.exists():
-        logger.info(f"File {slug} already present, skipping.")
+        logger.debug(f"File {slug} already present, skipping.")
         return destfile
 
     logger.info(f"Downloading {slug} from {resources_url}")
@@ -65,7 +65,7 @@ def download_resources(
                 {"slug": slug, "destfile": str(destfile), "downloaded": True}
             )
         except Exception:
-            logger.warning(
+            logger.debug(
                 f"Failed to download {slug} from {url}. Retrying with original_url..."
             )
             try:
