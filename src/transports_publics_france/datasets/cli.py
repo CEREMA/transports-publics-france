@@ -80,5 +80,3 @@ def main():
         dataset_manager.update_datagouv_dataset(dry=False)
     elif input_args.dry_publish:
         dataset_manager.update_datagouv_dataset(dry=True)
-    else:  # pragma: no cover
-        print("No action provided. Use --publish API_KEY or --dry-publish")
