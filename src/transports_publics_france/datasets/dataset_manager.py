@@ -7,6 +7,7 @@ This module does not correspond to a dataset released and managed by `transports
 from abc import ABC, abstractmethod
 import datagouv
 import os
+from loguru import logger
 from transports_publics_france.utils import get_package_version
 
 CEREMA_ORGANIZATION_ID = "5c812a16634f416583ed1876"
@@ -21,15 +22,12 @@ class DatasetManager(ABC):
     Subclasses should identify the dataset and implement how its resources are generated and updated.
     """
 
-    def __init__(self, environment="www", verbose=False):
+    def __init__(self, environment="www"):
         """
         Create a DatasetManager instance.
 
         :param environment: url prefix, see Client class
-        :param verbose: manager and client verbosity
         """
-        # process verbosity
-        self.verbose: bool = verbose
 
         # datagouv.Dataset instance cache
         self._dataset = None
@@ -95,8 +93,9 @@ class DatasetManager(ABC):
         self.create_folder()
 
         # call resource generation method
-        self.log(f"Start generating resources for '{self.dataset_key()}' dataset")
+        logger.info(f"Start generating resources for '{self.dataset_key()}' dataset")
         self._generate_dataset_resources()
+        logger.info(f"Resources for '{self.dataset_key()}' dataset have been generated")
 
     @abstractmethod
     def _generate_dataset_resources(self):
@@ -117,7 +116,7 @@ class DatasetManager(ABC):
         :param api_key: API key used to authenticate to datagouv.fr
         """
         self.datagouv_client = datagouv.Client(
-            environment=self._client_environment, api_key=api_key, verbose=self.verbose
+            environment=self._client_environment, api_key=api_key, verbose=True
         )
 
     def update_datagouv_dataset(self, dry: bool):
@@ -129,11 +128,11 @@ class DatasetManager(ABC):
         # store dry value
         self._dry_update_datagouv = dry
 
-        self.log(
+        logger.info(
             f"Start updating '{self.dataset_key()}' dataset on datagouv.fr (datagouv id: {self.dataset_id()})"
         )
         self._update_datagouv_dataset()
-        self.log(
+        logger.success(
             f"'{self.dataset_key()}' dataset has been successfully updated (datagouv id: {self.dataset_id()})"
         )
 
@@ -182,7 +181,7 @@ class DatasetManager(ABC):
             resource_id = self.dataset.create_static(filepath, full_payload).id
 
         # log success
-        self.log(
+        logger.success(
             f"{"[Dry] " if self._dry_update_datagouv else ""}Created resource '{title}' ({resource_id}) from file: {filepath}"
         )
         return resource_id
@@ -209,7 +208,7 @@ class DatasetManager(ABC):
             self.datagouv_client.resource(resource_id).update(full_payload, filepath)
 
         # log success
-        self.log(
+        logger.success(
             f"{"[Dry] " if self._dry_update_datagouv else ""}Updated resource {resource_id} with file: {filepath}"
         )
 
@@ -253,19 +252,11 @@ class DatasetManager(ABC):
 
     # utils
 
-    def log(self, message):
-        """
-        Log a message if verbose.
-
-        :param message: message to log
-        """
-        if self.verbose:
-            print(message)
-
     def create_folder(self):
         """
         Create the dataset folder if it doesn't already exist.
         """
+        logger.debug(f"Create dataset folder: {self.folder}")
         os.makedirs(self.folder, exist_ok=True)
 
 
