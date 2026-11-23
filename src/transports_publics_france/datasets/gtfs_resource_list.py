@@ -23,8 +23,8 @@ class GtfsDatasetsInfo(DatasetManager):
     # subfolder of the dataset folder for the (heavy) intermediate files
     WORK_SUBFOLDER = "data"
 
-    def __init__(self, verbose=False, run_date: datetime.date | None = None):
-        super().__init__(verbose=verbose)
+    def __init__(self, run_date: datetime.date | None = None):
+        super().__init__()
         self.run_date: datetime.date = run_date or datetime.date.today()
 
     @property
