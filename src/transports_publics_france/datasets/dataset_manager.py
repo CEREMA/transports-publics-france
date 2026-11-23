@@ -89,11 +89,12 @@ class DatasetManager(ABC):
         """
         Prepare resource generation and call the _generate_dataset_resources method.
         """
+        logger.info(f"Start generating resources for '{self.dataset_key()}' dataset")
+
         # create target folder
         self.create_folder()
 
         # call resource generation method
-        logger.info(f"Start generating resources for '{self.dataset_key()}' dataset")
         self._generate_dataset_resources()
         logger.info(f"Resources for '{self.dataset_key()}' dataset have been generated")
 
@@ -256,8 +257,9 @@ class DatasetManager(ABC):
         """
         Create the dataset folder if it doesn't already exist.
         """
-        logger.debug(f"Create dataset folder: {self.folder}")
-        os.makedirs(self.folder, exist_ok=True)
+        if not os.path.exists(self.folder):
+            logger.debug(f"Create dataset folder: {self.folder}")
+            os.makedirs(self.folder)
 
 
 def get_cerema_organization(api_key: str | None = None) -> datagouv.Organization:

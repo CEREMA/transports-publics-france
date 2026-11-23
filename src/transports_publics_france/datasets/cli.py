@@ -7,6 +7,7 @@ This module does not correspond to a dataset released and managed by `transports
 """
 
 import argparse
+from loguru import logger
 from transports_publics_france.utils import enable_logs
 from transports_publics_france.datasets import DatasetManager, DATASET_KEY_MAPPER
 
@@ -70,6 +71,8 @@ def main():
         dataset_manager: DatasetManager = dataset_class()
     except KeyError:  # pragma: no cover
         raise ValueError(f"Dataset key {input_args.dataset} was not found")
+
+    logger.info(f"Start dataset generation pipeline for '{input_args.dataset}' dataset ")
 
     # generate datasets resources
     dataset_manager.generate_dataset_resources()
