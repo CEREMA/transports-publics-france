@@ -4,6 +4,8 @@ Utility functions useful everywhere
 
 import importlib.metadata
 import polars as pl
+from loguru import logger
+import sys
 
 
 def _flatten_nested_columns(df: pl.DataFrame) -> pl.DataFrame:
@@ -27,6 +29,24 @@ def _flatten_nested_columns(df: pl.DataFrame) -> pl.DataFrame:
             # Struct -> JSON
             df = df.with_columns(pl.col(col).struct.json_encode().alias(col))
     return df
+
+
+def enable_logs(level="INFO") -> int:
+    """
+    Enable logs of the `transports-publics-france` package and set a simple log sink.
+
+    :param level: logging level
+
+    :return: identifier associated with the added sink
+    """
+    # enable package logs
+    logger.enable("transports_publics_france")
+
+    # remove default sink
+    logger.remove()
+
+    # add a simple sink
+    return logger.add(sys.stderr, format="<level>{level: <8} :: {message}</level>", level=level)
 
 
 def get_package_version() -> str:
