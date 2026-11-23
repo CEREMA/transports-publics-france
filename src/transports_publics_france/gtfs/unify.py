@@ -5,13 +5,10 @@ Compilation of the stops of all the GTFS datasets into a single table :
 
 import gc
 from pathlib import Path
-import logging
-import traceback
 import polars as pl
-
+from loguru import logger
 from transports_publics_france.config import TABLES_GTFS
 
-log = logging.getLogger(__name__)
 
 
 def compile_all_stops(all_stops_data: list[pl.DataFrame]) -> pl.DataFrame:
@@ -31,7 +28,7 @@ def compile_all_stops(all_stops_data: list[pl.DataFrame]) -> pl.DataFrame:
         all_stops = pl.concat(all_stops_data, how="diagonal")
     else:
         all_stops = pl.DataFrame()
-        log.warning("No stops compiled.")
+        logger.warning("No stops compiled.")
 
     if len(all_stops) > 0:
         # Final cleanups
@@ -121,13 +118,13 @@ def compile_all_stops(all_stops_data: list[pl.DataFrame]) -> pl.DataFrame:
 def unify_gtfs_tables(raw_dir: Path, out_dir: Path) -> None:
     """Stack the tables of all datasets (raw_dir/<table>/<dataset_id>.parquet)
     into one parquet per table in out_dir."""
-    log.info("=== Unification of the raw GTFS tables ===")
+    logger.info("=== Unification of the raw GTFS tables ===")
 
     for tbl in TABLES_GTFS:
         tbl_dir = raw_dir / tbl
         fichiers = list(tbl_dir.glob("*.parquet")) if tbl_dir.exists() else []
         if not fichiers:
-            log.warning("Table %s : no file was found, pass.", tbl)
+            logger.warning(f"Table {tbl} : no file was found, pass.")
             continue
 
         out_path = out_dir / f"{tbl}.parquet"
@@ -142,8 +139,8 @@ def unify_gtfs_tables(raw_dir: Path, out_dir: Path) -> None:
                 consolidated.write_parquet(out_path)
                 del dfs, consolidated
 
-            log.info("Table %s unified (%d datasets).", tbl, len(fichiers))
+            logger.info(f"Table {tbl} unified ({len(fichiers)} datasets).")
             gc.collect()
         except Exception as e:
-            log.error("Table %s : failed to unify (%s).", tbl, e)
-            log.error(traceback.format_exc())
+            logger.error(f"Table {tbl} : failed to unify")
+            logger.exception(e)

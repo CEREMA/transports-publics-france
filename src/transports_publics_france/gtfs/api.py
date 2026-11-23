@@ -3,11 +3,9 @@ Utils for interacting with the transport.data.gouv.fr API :
 - get_gtfs_datasets_info()
 """
 
-import logging
 import polars as pl
 import requests
-
-log = logging.getLogger(__name__)
+from loguru import logger
 
 
 def get_gtfs_datasets_info() -> pl.DataFrame:
@@ -19,7 +17,7 @@ def get_gtfs_datasets_info() -> pl.DataFrame:
     - Filter resources_format == "GTFS" (case-insensitive)
     - Detection of duplicates in resources_datagouv_id
     """
-    log.info("Getting dataset information from transport.data.gouv.fr")
+    logger.info("Getting dataset information from transport.data.gouv.fr")
 
     resp = requests.get("https://transport.data.gouv.fr/api/datasets", timeout=60)
     resp.raise_for_status()
@@ -103,10 +101,10 @@ def get_gtfs_datasets_info() -> pl.DataFrame:
             # TODO : mettre resources au singulier, traduire en anglais
 
     if duplicates:
-        log.warning(
-            "Found duplicates in resources_datagouv_id : %s",
-            ", ".join(str(d) for d in set(duplicates)),
+        logger.warning(
+            "Found duplicates in resources_datagouv_id : {duplicates}",
+            duplicates=", ".join(str(d) for d in set(duplicates)),
         )
 
-    log.info("%d available resources GTFS after filtering.", len(rows))
+    logger.info(f"{len(rows)} available resources GTFS after filtering.")
     return pl.DataFrame(rows)

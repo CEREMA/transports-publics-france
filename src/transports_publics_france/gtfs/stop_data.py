@@ -8,8 +8,7 @@ Construction de la table des arrêts × lignes pour un dataset GTFS :
 - _join_all() : stops × stop_times × trips × routes × agency
 """
 
-import logging
-import traceback
+from loguru import logger
 from datetime import date
 import polars as pl
 
@@ -22,7 +21,6 @@ from transports_publics_france.gtfs.gtfs_processing import (
 
 from transports_publics_france.config import MODE_PRIORITY
 
-log = logging.getLogger(__name__)
 
 # Statuts retournés (repris tels quels dans result_extract)
 STATUS_SUCCESS = "success"
@@ -71,14 +69,14 @@ def get_stop_data(
         )
 
         if len(stops_df) == 0:
-            log.warning("Dataset %s : no stops, pass.", dataset_id)
+            logger.warning(f"Dataset {dataset_id} : no stops, pass.")
             return None, STATUS_NO_STOPS
 
         active_services = get_active_services(
             tables.get("calendar"), tables.get("calendar_dates"), run_date, day_run_date
         )
         if len(active_services) == 0:
-            log.warning("Dataset %s : no active services today, pass.", dataset_id)
+            logger.warning(f"Dataset {dataset_id} : no active services today, pass.")
             return None, STATUS_NO_SERVICES
 
         # Only active services
@@ -121,8 +119,8 @@ def get_stop_data(
         return processed, STATUS_SUCCESS
 
     except Exception as e:
-        log.warning("Dataset %s : erreur de traitement (%s), on passe.", dataset_id, e)
-        log.warning(traceback.format_exc())
+        logger.error(f"Dataset {dataset_id} : erreur de traitement, on passe.")
+        logger.exception(e)
         return None, STATUS_ERROR
 
 
