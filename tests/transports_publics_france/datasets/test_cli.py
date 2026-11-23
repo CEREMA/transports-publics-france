@@ -9,10 +9,10 @@ def test_create_parser():
 
     assert isinstance(parser, argparse.ArgumentParser)
 
-    input_args = parser.parse_args(["demo", "--verbose", "--dry-publish"])
+    input_args = parser.parse_args(["demo", "--dry-publish", "--log-level", "ERROR"])
 
     assert input_args.dataset == "demo"
-    assert input_args.verbose
+    assert input_args.log_level == "ERROR"
     assert not input_args.publish
     assert input_args.dry_publish
 

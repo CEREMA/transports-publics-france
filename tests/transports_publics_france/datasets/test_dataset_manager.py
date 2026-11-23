@@ -15,9 +15,8 @@ class TestDataSetManager:
         return Demo()
 
     def test_init(self):
-        instance = Demo(verbose=True)
+        instance = Demo()
 
-        assert instance.verbose
         assert isinstance(instance.datagouv_client, datagouv.Client)
 
     def test_dataset_key(self):
@@ -134,20 +133,6 @@ class TestDataSetManager:
                 "transports-publics-france-version": fake_version,
             },
         }
-
-    def test_log(self, example_instance, mocker):
-        mock = mocker.patch("transports_publics_france.datasets.dataset_manager.print")
-        example_instance.verbose = True
-
-        example_instance.log("TEST_0")
-
-        mock.assert_called_with("TEST_0")
-        assert len(mock.mock_calls) == 1
-
-        example_instance.verbose = False
-        example_instance.log("TEST_1")
-
-        assert len(mock.mock_calls) == 1
 
     def test_create_folder(self, example_instance, mocker):
         mock = mocker.patch(
