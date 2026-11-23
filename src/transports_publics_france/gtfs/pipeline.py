@@ -218,16 +218,16 @@ def _save_results(
     result_df.write_csv(out_dir / f"{date_str}_{name}.csv")
 
 
-if __name__ == "__main__":
-    logging.basicConfig(
-        level=logging.INFO,
-        format="%(asctime)s [%(levelname)s] %(message)s",
-        datefmt="%H:%M:%S",
-    )
-
-    # RUN_DATE = date.today()
-    RUN_DATE = date(2026, 10, 26)  # format = YYYY, M, D
-    REDOWNLOAD = False
-    DATA_DIR = Path(os.environ.get("DATA_DIR", Path.cwd() / "data"))
-
-    run_gtfs_pipeline(out_dir=DATA_DIR, run_date=RUN_DATE, redownload=REDOWNLOAD)
+# if __name__ == "__main__":
+#     logging.basicConfig(
+#         level=logging.INFO,
+#         format="%(asctime)s [%(levelname)s] %(message)s",
+#         datefmt="%H:%M:%S",
+#     )
+#
+#     # RUN_DATE = date.today()
+#     RUN_DATE = date(2026, 10, 26)  # format = YYYY, M, D
+#     REDOWNLOAD = False
+#     DATA_DIR = Path(os.environ.get("DATA_DIR", Path.cwd() / "data"))
+#
+#     run_gtfs_pipeline(out_dir=DATA_DIR, run_date=RUN_DATE, redownload=REDOWNLOAD)

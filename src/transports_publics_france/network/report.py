@@ -223,15 +223,15 @@ def _find_agregat(
     return (None, None)
 
 
-if __name__ == "__main__":
-    # RUN_DATE = date.today()
-    RUN_DATE = date(2026, 10, 26)  # format = YYYY, M, D
-    DATA_DIR = Path(os.environ.get("DATA_DIR", Path.cwd() / "data"))
-
-    logging.basicConfig(
-        level=logging.INFO,
-        format="%(asctime)s [%(levelname)s] %(message)s",
-        datefmt="%H:%M:%S",
-    )
-
-    gtfs_report = build_network_report(RUN_DATE, DATA_DIR)
+# if __name__ == "__main__":
+#     # RUN_DATE = date.today()
+#     RUN_DATE = date(2026, 10, 26)  # format = YYYY, M, D
+#     DATA_DIR = Path(os.environ.get("DATA_DIR", Path.cwd() / "data"))
+#
+#     logging.basicConfig(
+#         level=logging.INFO,
+#         format="%(asctime)s [%(levelname)s] %(message)s",
+#         datefmt="%H:%M:%S",
+#     )
+#
+#     gtfs_report = build_network_report(RUN_DATE, DATA_DIR)
