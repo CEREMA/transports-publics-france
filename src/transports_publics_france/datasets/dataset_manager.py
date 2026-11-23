@@ -257,9 +257,8 @@ class DatasetManager(ABC):
         """
         Create the dataset folder if it doesn't already exist.
         """
-        if not os.path.exists(self.folder):
-            logger.debug(f"Create dataset folder: {self.folder}")
-            os.makedirs(self.folder)
+        logger.debug(f"Create dataset folder: {self.folder}")
+        os.makedirs(self.folder, exist_ok=True)
 
 
 def get_cerema_organization(api_key: str | None = None) -> datagouv.Organization:
