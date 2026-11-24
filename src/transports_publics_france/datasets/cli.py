@@ -75,7 +75,7 @@ def main():
     logger.info(
         f"Start dataset generation pipeline for '{input_args.dataset}' dataset "
     )
-        
+
     # get dataset generation class
     try:
         dataset_class = DATASET_KEY_MAPPER[input_args.dataset]
@@ -86,7 +86,7 @@ def main():
     if input_args.clean:
         logger.info(f"Delete the dataset folder: {dataset_manager.folder}")
         dataset_manager.delete_folder()
-        
+
     # generate datasets resources
     dataset_manager.generate_dataset_resources()
 
