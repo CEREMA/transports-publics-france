@@ -29,14 +29,19 @@ def mock_command_line(mocker):
     return _mock_command_line
 
 
-def test_main_publish_conflict(mock_command_line):
+@pytest.fixture
+def mock_logger_enable(mocker):
+    mocker.patch("transports_publics_france.datasets.cli.enable_logs")
+
+
+def test_main_publish_conflict(mock_command_line, mock_logger_enable):
     mock_command_line(["demo", "--publish", "API_KEY", "--dry-publish"])
 
     with pytest.raises(ValueError):
         main()
 
 
-def test_main_publish(mock_command_line, mocker):
+def test_main_publish(mock_command_line, mocker, mock_logger_enable):
     mock_command_line(["demo", "--publish", "API_KEY"])
 
     mock = mocker.patch(
@@ -48,7 +53,7 @@ def test_main_publish(mock_command_line, mocker):
     mock.assert_called_with(dry=False)
 
 
-def test_main_dry_publish(mock_command_line, mocker):
+def test_main_dry_publish(mock_command_line, mocker, mock_logger_enable):
     mock_command_line(["demo", "--dry-publish"])
 
     mock = mocker.patch(
