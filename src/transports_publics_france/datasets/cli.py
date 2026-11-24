@@ -59,6 +59,7 @@ def main():
     input_args = parser.parse_args()
 
     # setup logging
+    logger.remove()  # remove default sink
     enable_logs(input_args.log_level)
 
     # check publish args

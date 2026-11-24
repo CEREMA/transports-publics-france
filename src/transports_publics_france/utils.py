@@ -42,9 +42,6 @@ def enable_logs(level="INFO") -> int:
     # enable package logs
     logger.enable("transports_publics_france")
 
-    # remove default sink
-    logger.remove()
-
     # add a simple sink
     return logger.add(sys.stderr, format="<green>{time:YYYY-MM-DD HH:mm:ss.SSS}</green> | <level>{level: <8} :: {message}</level>", level=level)
 
