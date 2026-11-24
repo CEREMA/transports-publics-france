@@ -48,6 +48,12 @@ def create_parser():
         action="store_true",
     )
 
+    parser.add_argument(
+        "--clean",
+        help="clean the dataset folder before generating the resources, ensuring no intermediate files are used",
+        action="store_true",
+    )
+
     return parser
 
 
@@ -66,6 +72,10 @@ def main():
     if input_args.publish and input_args.dry_publish:
         raise ValueError("Cannot publish and dry publish at the same time")
 
+    logger.info(
+        f"Start dataset generation pipeline for '{input_args.dataset}' dataset "
+    )
+        
     # get dataset generation class
     try:
         dataset_class = DATASET_KEY_MAPPER[input_args.dataset]
@@ -73,10 +83,10 @@ def main():
     except KeyError:  # pragma: no cover
         raise ValueError(f"Dataset key {input_args.dataset} was not found")
 
-    logger.info(
-        f"Start dataset generation pipeline for '{input_args.dataset}' dataset "
-    )
-
+    if input_args.clean:
+        logger.info(f"Delete the dataset folder: {dataset_manager.folder}")
+        dataset_manager.delete_folder()
+        
     # generate datasets resources
     dataset_manager.generate_dataset_resources()
 
