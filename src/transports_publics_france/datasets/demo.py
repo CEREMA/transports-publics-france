@@ -7,6 +7,7 @@ import shutil
 import datetime
 from loguru import logger
 
+
 class Demo(DatasetManager):
     """
     Demonstration class that pushes the package license to a demo dataset.

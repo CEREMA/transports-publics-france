@@ -17,7 +17,6 @@ from loguru import logger
 from transports_publics_france.config import TABLES_GTFS
 
 
-
 def extract_gtfs_zip(gtfs_zip_file: Path, files: list[str] | None = None) -> dict:
     """Extract the *.txt files from a GTFS zip file into its parent directory.
 

@@ -23,7 +23,6 @@ from transports_publics_france.gtfs.unify import compile_all_stops, unify_gtfs_t
 from transports_publics_france.utils import _flatten_nested_columns
 
 
-
 # TODO : Séparer le pipeline en : build_national_gtfs / build_stops_table ?
 def run_gtfs_pipeline(
     out_dir: Path, run_date: date = date.today(), redownload: bool = True

@@ -22,7 +22,6 @@ from transports_publics_france.config import GEO_RANK
 from transports_publics_france.utils import _flatten_nested_columns
 
 
-
 def build_network_report(run_date: date, data_dir: Path) -> pl.DataFrame:
     """
     Fonction englobant tout le script.
@@ -92,7 +91,9 @@ def build_network_report(run_date: date, data_dir: Path) -> pl.DataFrame:
             ]
         )
         nb_matches = sum(1 for m in matches if m[0] is not None)
-        logger.info(f"{nb_matches} individual GTFS(s) connected to a regional aggregate.")
+        logger.info(
+            f"{nb_matches} individual GTFS(s) connected to a regional aggregate."
+        )
     else:
         logger.warning(
             "Columns is_agregat/offer_ids missing, regional aggregate matching ignored."

@@ -11,7 +11,6 @@ import polars as pl
 import requests
 
 
-
 def download_resource(
     slug: str,
     resources_id: str | int,
@@ -81,6 +80,7 @@ def download_resources(
     failed = dl_df.filter(~pl.col("downloaded"))
     if len(failed) > 0:
         logger.warning(
-            "Resources not downloaded : {resource_list}", resource_list=", ".join(failed["slug"].to_list())
+            "Resources not downloaded : {resource_list}",
+            resource_list=", ".join(failed["slug"].to_list()),
         )
     return dl_df

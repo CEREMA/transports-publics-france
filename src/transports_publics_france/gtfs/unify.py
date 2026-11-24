@@ -10,7 +10,6 @@ from loguru import logger
 from transports_publics_france.config import TABLES_GTFS
 
 
-
 def compile_all_stops(all_stops_data: list[pl.DataFrame]) -> pl.DataFrame:
     """Concatenate the stops tables of the datasets, then clean and deduplicate them.
 

@@ -43,7 +43,11 @@ def enable_logs(level="INFO") -> int:
     logger.enable("transports_publics_france")
 
     # add a simple sink
-    return logger.add(sys.stderr, format="<green>{time:YYYY-MM-DD HH:mm:ss.SSS}</green> | <level>{level: <8} :: {message}</level>", level=level)
+    return logger.add(
+        sys.stderr,
+        format="<green>{time:YYYY-MM-DD HH:mm:ss.SSS}</green> | <level>{level: <8} :: {message}</level>",
+        level=level,
+    )
 
 
 def get_package_version() -> str:

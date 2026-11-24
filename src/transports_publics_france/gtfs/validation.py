@@ -8,7 +8,6 @@ from loguru import logger
 from transports_publics_france.config import REQUIRED_FILES, REQUIRED_COLS
 
 
-
 def validate_gtfs_tables(
     tables: dict[str, pl.DataFrame],
     dataset_id: str = "",

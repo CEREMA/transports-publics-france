@@ -73,7 +73,9 @@ def main():
     except KeyError:  # pragma: no cover
         raise ValueError(f"Dataset key {input_args.dataset} was not found")
 
-    logger.info(f"Start dataset generation pipeline for '{input_args.dataset}' dataset ")
+    logger.info(
+        f"Start dataset generation pipeline for '{input_args.dataset}' dataset "
+    )
 
     # generate datasets resources
     dataset_manager.generate_dataset_resources()
