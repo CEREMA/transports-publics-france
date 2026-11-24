@@ -44,6 +44,12 @@ def create_parser():
         action="store_true",
     )
 
+    parser.add_argument(
+        "--clean",
+        help="clean the dataset folder before generating the resources, ensuring no intermediate files are used",
+        action="store_true",
+    )
+
     return parser
 
 
@@ -64,6 +70,9 @@ def main():
         dataset_manager: DatasetManager = dataset_class(verbose=input_args.verbose)
     except KeyError:  # pragma: no cover
         raise ValueError(f"Dataset key {input_args.dataset} was not found")
+
+    if input_args.clean:
+        dataset_manager.delete_folder()
 
     # generate datasets resources
     dataset_manager.generate_dataset_resources()
