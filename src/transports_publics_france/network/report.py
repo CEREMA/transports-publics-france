@@ -11,17 +11,15 @@ the following files must exist :
     - {date}_gtfs_datasets_raw.csv
 """
 
-import logging
 import os
 from datetime import date
 from pathlib import Path
 import polars as pl
+from loguru import logger
 
 from transports_publics_france.config import GEO_RANK
 
 from transports_publics_france.utils import _flatten_nested_columns
-
-log = logging.getLogger(__name__)
 
 
 def build_network_report(run_date: date, data_dir: Path) -> pl.DataFrame:
@@ -41,14 +39,14 @@ def build_network_report(run_date: date, data_dir: Path) -> pl.DataFrame:
         )
 
     networks_df = pl.read_csv(networks_path)
-    log.info("networks_df loaded (%d rows).", len(networks_df))
+    logger.info(f"networks_df loaded ({len(networks_df)} rows).")
 
     if gtfs_datasets_path.exists():
         gtfs_datasets = pl.read_csv(gtfs_datasets_path)
-        log.info("gtfs_datasets loaded (%d rows).", len(gtfs_datasets))
+        logger.info(f"gtfs_datasets loaded ({len(gtfs_datasets)} rows).")
     else:
-        log.warning(
-            "%s not found, report limited to observed data.", gtfs_datasets_path
+        logger.warning(
+            f"{gtfs_datasets_path} not found, report limited to observed data."
         )
         gtfs_datasets = pl.DataFrame()
 
@@ -75,9 +73,8 @@ def build_network_report(run_date: date, data_dir: Path) -> pl.DataFrame:
             )
             if _offer_id_set(row["offer_ids"])
         ]
-        log.info(
-            "%d regional aggregate(s) identified for matching (via offers API).",
-            len(agregats_info),
+        logger.info(
+            f"{len(agregats_info)} regional aggregate(s) identified for matching (via offers API).",
         )
 
         matches = [
@@ -94,9 +91,11 @@ def build_network_report(run_date: date, data_dir: Path) -> pl.DataFrame:
             ]
         )
         nb_matches = sum(1 for m in matches if m[0] is not None)
-        log.info("%d individual GTFS(s) connected to a regional aggregate.", nb_matches)
+        logger.info(
+            f"{nb_matches} individual GTFS(s) connected to a regional aggregate."
+        )
     else:
-        log.warning(
+        logger.warning(
             "Columns is_agregat/offer_ids missing, regional aggregate matching ignored."
         )
 
@@ -185,7 +184,7 @@ def build_network_report(run_date: date, data_dir: Path) -> pl.DataFrame:
     # Effective save
     csv_path = data_dir / f"{date_str}_gtfs_resource_list.csv"
     gtfs_resource_list.write_csv(csv_path)
-    log.info("Network report (CSV) written : %s.", csv_path)
+    logger.info(f"Network report (CSV) written : {csv_path}.")
 
     return gtfs_resource_list
 
@@ -223,15 +222,15 @@ def _find_agregat(
     return (None, None)
 
 
-if __name__ == "__main__":
-    # RUN_DATE = date.today()
-    RUN_DATE = date(2026, 10, 26)  # format = YYYY, M, D
-    DATA_DIR = Path(os.environ.get("DATA_DIR", Path.cwd() / "data"))
-
-    logging.basicConfig(
-        level=logging.INFO,
-        format="%(asctime)s [%(levelname)s] %(message)s",
-        datefmt="%H:%M:%S",
-    )
-
-    gtfs_report = build_network_report(RUN_DATE, DATA_DIR)
+# if __name__ == "__main__":
+#     # RUN_DATE = date.today()
+#     RUN_DATE = date(2026, 10, 26)  # format = YYYY, M, D
+#     DATA_DIR = Path(os.environ.get("DATA_DIR", Path.cwd() / "data"))
+#
+#     logging.basicConfig(
+#         level=logging.INFO,
+#         format="%(asctime)s [%(levelname)s] %(message)s",
+#         datefmt="%H:%M:%S",
+#     )
+#
+#     gtfs_report = build_network_report(RUN_DATE, DATA_DIR)

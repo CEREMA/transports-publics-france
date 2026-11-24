@@ -7,13 +7,10 @@ Business logic functions for GTFS data processing :
 - summarize_network(tables, dataset_id, run_date)
 """
 
-import logging
 from datetime import date
 import polars as pl
 
 from transports_publics_france.config import ROUTE_TYPE_MAP, ID_COLS
-
-log = logging.getLogger(__name__)
 
 
 def get_active_services(

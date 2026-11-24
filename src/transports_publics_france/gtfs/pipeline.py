@@ -6,10 +6,10 @@ Public function : run_gtfs_pipeline()
 
 import os
 import gc
-import logging
 from pathlib import Path
 from datetime import date
 import polars as pl
+from loguru import logger
 
 from transports_publics_france.config import DAYS_EN
 
@@ -21,8 +21,6 @@ from transports_publics_france.gtfs.validation import validate_gtfs_tables
 from transports_publics_france.gtfs.gtfs_processing import prefix_ids, summarize_network
 from transports_publics_france.gtfs.unify import compile_all_stops, unify_gtfs_tables
 from transports_publics_france.utils import _flatten_nested_columns
-
-log = logging.getLogger(__name__)
 
 
 # TODO : Séparer le pipeline en : build_national_gtfs / build_stops_table ?
@@ -42,7 +40,7 @@ def run_gtfs_pipeline(
     gtfs_datasets = _fetch_metadata(run_date)
     gtfs_dirs = _download_and_list_gtfs(base_dir, gtfs_datasets, redownload=redownload)
 
-    log.info("=== Read and compilation of GTFS ===")
+    logger.info("=== Read and compilation of GTFS ===")
     result_extract, networks_list, all_stops_data = _process_all_datasets(
         gtfs_dirs, run_date, raw_dir
     )
@@ -59,26 +57,24 @@ def run_gtfs_pipeline(
         all_stops.write_parquet(out_path)
 
         nb_success = sum(1 for r in result_extract if r["result"] == "success")
-        log.info("Completed ! %d stops compiled.", len(all_stops))
-        log.info("File saved : %s", out_path)
-        log.info(
-            "Extraction report : %d/%d datasets processed successfully.",
-            nb_success,
-            len(result_extract),
+        logger.info(f"Completed ! {len(all_stops)} stops compiled.")
+        logger.info(f"File saved : {out_path}")
+        logger.info(
+            f"Extraction report : {nb_success}/{len(result_extract)} datasets processed successfully."
         )
 
 
 def _fetch_metadata(run_date: date) -> pl.DataFrame:
-    log.info("=== GTFS metadata recuperation ===")
+    logger.info("=== GTFS metadata recuperation ===")
 
     try:
         gtfs_datasets = get_gtfs_datasets_info()
         gtfs_datasets = gtfs_datasets.with_columns(
             pl.lit(str(run_date)).alias("resources_extract_date")
         )
-        log.info("%d available GTFS datasets on the API.", len(gtfs_datasets))
+        logger.info(f"{len(gtfs_datasets)} available GTFS datasets on the API.")
     except Exception as e:
-        log.error("Impossible to get the metadata : %s", e)
+        logger.error(f"Impossible to get the metadata : {e}")
         gtfs_datasets = pl.DataFrame()
 
     return gtfs_datasets
@@ -87,7 +83,7 @@ def _fetch_metadata(run_date: date) -> pl.DataFrame:
 def _download_and_list_gtfs(
     base_dir: Path, gtfs_datasets: pl.DataFrame, redownload: bool
 ) -> list[Path]:
-    log.info("=== Download / detection of the already downloaded GTFS ===")
+    logger.info("=== Download / detection of the already downloaded GTFS ===")
 
     if redownload and len(gtfs_datasets) > 0:
         download_resources(base_dir, gtfs_datasets, timeout=20)
@@ -97,7 +93,7 @@ def _download_and_list_gtfs(
     )
     gtfs_dirs = [d for d in all_dirs if (d / "gtfs.zip").exists()]
     gtfs_dirs.sort()
-    log.info("%d GTFS to process", len(gtfs_dirs))
+    logger.info(f"{len(gtfs_dirs)} GTFS to process")
     return gtfs_dirs
 
 
@@ -111,7 +107,7 @@ def _process_all_datasets(
     n_datasets = len(gtfs_dirs)
 
     day_run_date = DAYS_EN[run_date.weekday()]
-    print("Run date:", run_date, "Day of the week:", day_run_date)
+    logger.info(f"Run date: {run_date}, Day of the week: {day_run_date}")
 
     for i, dataset_path in enumerate(gtfs_dirs, 1):
         status, stops, network = _process_dataset(
@@ -123,12 +119,8 @@ def _process_all_datasets(
             networks_list.append(network)
         if stops is not None:
             all_stops_data.append(stops)
-            log.info(
-                "Dataset %s (%d/%d) : %d arrêts traités.",
-                dataset_path.name,
-                i,
-                n_datasets,
-                len(stops),
+            logger.info(
+                f"Dataset {dataset_path.name} ({i}/{n_datasets}) : {len(stops)} arrêts traités."
             )
         gc.collect()
 
@@ -146,7 +138,7 @@ def _process_dataset(
     tables = load_gtfs_tables(dataset_path)
     dataset_id = dataset_path.name
     if tables is None:
-        log.warning("Dataset %s : failed extraction, pass.", dataset_id)
+        logger.warning(f"Dataset {dataset_id} : failed extraction, pass.")
         return "failed extract", None, None
 
     error = validate_gtfs_tables(tables, dataset_id)
@@ -183,7 +175,7 @@ def _persist_report_data(
     gtfs_datasets: pl.DataFrame,
     run_date: date,
 ) -> None:
-    log.info("=== Persisting raw data for the network report ===")
+    logger.info("=== Persisting raw data for the network report ===")
 
     date_str = str(run_date).replace("-", "")
 
@@ -192,22 +184,22 @@ def _persist_report_data(
         networks_df = _flatten_nested_columns(networks_df)
         networks_df = networks_df.with_columns(pl.col(pl.String).str.strip_chars_end())
         networks_df.write_csv(out_dir / f"{date_str}_networks_raw.csv")
-        log.info("networks_df persistated (%d rows).", len(networks_df))
+        logger.info(f"networks_df persistated ({len(networks_df)} rows).")
     else:
-        log.warning("networks_list is empty, nothing to persist for the report.")
+        logger.warning("networks_list is empty, nothing to persist for the report.")
 
     if len(gtfs_datasets) > 0:
         gtfs_datasets = _flatten_nested_columns(gtfs_datasets)
         gtfs_datasets.write_csv(out_dir / f"{date_str}_gtfs_datasets_raw.csv")
-        log.info("gtfs_datasets persistated (%d rows).", len(gtfs_datasets))
+        logger.info(f"gtfs_datasets persistated ({len(gtfs_datasets)} rows).")
     else:
-        log.warning("gtfs_datasets is empty, nothing to persist for the report.")
+        logger.warning("gtfs_datasets is empty, nothing to persist for the report.")
 
 
 def _save_results(
     result_extract: list[dict], run_date: date, out_dir: Path, name: str
 ) -> None:
-    log.info("=== Saving results ===")
+    logger.info("=== Saving results ===")
 
     result_df = (
         pl.DataFrame(result_extract)
@@ -218,16 +210,16 @@ def _save_results(
     result_df.write_csv(out_dir / f"{date_str}_{name}.csv")
 
 
-if __name__ == "__main__":
-    logging.basicConfig(
-        level=logging.INFO,
-        format="%(asctime)s [%(levelname)s] %(message)s",
-        datefmt="%H:%M:%S",
-    )
-
-    # RUN_DATE = date.today()
-    RUN_DATE = date(2026, 10, 26)  # format = YYYY, M, D
-    REDOWNLOAD = False
-    DATA_DIR = Path(os.environ.get("DATA_DIR", Path.cwd() / "data"))
-
-    run_gtfs_pipeline(out_dir=DATA_DIR, run_date=RUN_DATE, redownload=REDOWNLOAD)
+# if __name__ == "__main__":
+#     logging.basicConfig(
+#         level=logging.INFO,
+#         format="%(asctime)s [%(levelname)s] %(message)s",
+#         datefmt="%H:%M:%S",
+#     )
+#
+#     # RUN_DATE = date.today()
+#     RUN_DATE = date(2026, 10, 26)  # format = YYYY, M, D
+#     REDOWNLOAD = False
+#     DATA_DIR = Path(os.environ.get("DATA_DIR", Path.cwd() / "data"))
+#
+#     run_gtfs_pipeline(out_dir=DATA_DIR, run_date=RUN_DATE, redownload=REDOWNLOAD)

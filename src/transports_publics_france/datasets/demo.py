@@ -5,6 +5,7 @@ Dataset update class demonstration.
 from transports_publics_france.datasets.dataset_manager import DatasetManager
 import shutil
 import datetime
+from loguru import logger
 
 
 class Demo(DatasetManager):
@@ -15,8 +16,8 @@ class Demo(DatasetManager):
     LICENSE_RESOURCE_FILENAME = "LICENSE_RESOURCE.txt"
 
     # ignore the __init__ if using this class as an example
-    def __init__(self, verbose=False):
-        super().__init__(environment="demo", verbose=verbose)
+    def __init__(self):
+        super().__init__(environment="demo")
 
     @classmethod
     def dataset_id(cls):
@@ -25,7 +26,7 @@ class Demo(DatasetManager):
     def _generate_dataset_resources(self):
         # copy LICENSE.txt to dataset folder
         dest = self.folder + self.LICENSE_RESOURCE_FILENAME
-        self.log(f"Copy license file to: {dest}")
+        logger.info(f"Copy license file to: {dest}")
         shutil.copyfile("LICENSE.txt", dest)
 
     def _update_datagouv_dataset(self):

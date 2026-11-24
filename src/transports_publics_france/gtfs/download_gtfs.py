@@ -4,13 +4,11 @@ Utils for downloading GTFS resources from transport.data.gouv.fr
 - download_resources(base_dir, gtfs_datasets, timeout)
 """
 
-import logging
+from loguru import logger
 import socket
 from pathlib import Path
 import polars as pl
 import requests
-
-log = logging.getLogger(__name__)
 
 
 def download_resource(
@@ -28,10 +26,10 @@ def download_resource(
     destfile.parent.mkdir(parents=True, exist_ok=True)
 
     if destfile.exists():
-        log.info("File %s already present, skipping.", slug)
+        logger.debug(f"File {slug} already present, skipping.")
         return destfile
 
-    log.info("Downloading %s from %s", slug, resources_url)
+    logger.info(f"Downloading {slug} from {resources_url}")
     r = requests.get(resources_url, timeout=15, stream=True)
     r.raise_for_status()
     with open(destfile, "wb") as f:
@@ -51,7 +49,7 @@ def download_resources(
     Returns a DataFrame with columns : slug, destfile, downloaded.
     """
     socket.setdefaulttimeout(timeout)
-    log.info("=== Downloading resources ===")
+    logger.info("=== Downloading resources ===")
     results = []
 
     for row in gtfs_datasets.iter_rows(named=True):
@@ -66,10 +64,8 @@ def download_resources(
                 {"slug": slug, "destfile": str(destfile), "downloaded": True}
             )
         except Exception:
-            log.warning(
-                "Failed to download %s from %s. Retrying with original_url...",
-                slug,
-                url,
+            logger.debug(
+                f"Failed to download {slug} from {url}. Retrying with original_url..."
             )
             try:
                 destfile = download_resource(slug, rid, original_url, base_dir)
@@ -77,13 +73,14 @@ def download_resources(
                     {"slug": slug, "destfile": str(destfile), "downloaded": True}
                 )
             except Exception as e2:
-                log.warning("Definitive failure for %s : %s", slug, e2)
+                logger.warning(f"Definitive failure for {slug} : {e2}")
                 results.append({"slug": slug, "destfile": None, "downloaded": False})
 
     dl_df = pl.DataFrame(results)
     failed = dl_df.filter(~pl.col("downloaded"))
     if len(failed) > 0:
-        log.warning(
-            "Resources not downloaded : %s", ", ".join(failed["slug"].to_list())
+        logger.warning(
+            "Resources not downloaded : {resource_list}",
+            resource_list=", ".join(failed["slug"].to_list()),
         )
     return dl_df

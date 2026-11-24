@@ -6,17 +6,15 @@ Input/Output utilities for the transports-publics-france package :
 - load_gtfs_tables(dataset_path, files_wanted, files_to_keep)
 """
 
-import logging
 import re
 import unicodedata
 import zipfile
 from pathlib import Path
 from io import StringIO
 import polars as pl
+from loguru import logger
 
 from transports_publics_france.config import TABLES_GTFS
-
-log = logging.getLogger(__name__)
 
 
 def extract_gtfs_zip(gtfs_zip_file: Path, files: list[str] | None = None) -> dict:
@@ -34,7 +32,8 @@ def extract_gtfs_zip(gtfs_zip_file: Path, files: list[str] | None = None) -> dic
         with zipfile.ZipFile(gtfs_zip_file) as zf:
             archive_names = zf.namelist()
     except Exception as e:
-        log.debug("Impossible to open %s : %s", gtfs_zip_file, e)
+        logger.error(f"Impossible to open {gtfs_zip_file}")
+        logger.exception(e)
         return {"files": None, "extracted": False}
 
     # pmatch : pour chaque nom demandé, trouve le fichier dans l'archive par basename
@@ -63,7 +62,8 @@ def extract_gtfs_zip(gtfs_zip_file: Path, files: list[str] | None = None) -> dic
                     dst.write(src.read())
                 extracted_names.append(basename)
     except Exception as e:
-        log.debug("Extracting error %s : %s", gtfs_zip_file, e)
+        logger.error(f"Extracting error {gtfs_zip_file} : %s")
+        logger.exception(e)
         return {"files": "", "extracted": False}
 
     return {
@@ -117,7 +117,8 @@ def read_gtfs_dataset(
             )
             result[f.stem] = df
         except Exception as e:
-            log.debug("Impossible to read %s : %s", f.name, e)
+            logger.error(f"Impossible to read {f.name}")
+            logger.exception(e)
 
     return result
 
@@ -155,7 +156,8 @@ def load_gtfs_tables(
         try:
             txt_file.unlink()
         except Exception as e:
-            log.debug("Impossible to delete %s : %s", txt_file, e)
+            logger.error(f"Impossible to delete {txt_file}")
+            logger.exception(e)
 
     # Correction: "calendars" → "calendar"
     if "calendars" in result and "calendar" not in result:
