@@ -4,6 +4,7 @@ This module contains utils dataset management.
 This module does not correspond to a dataset released and managed by `transports-publics-france`.
 """
 
+import shutil
 from abc import ABC, abstractmethod
 import datagouv
 import os
@@ -267,6 +268,13 @@ class DatasetManager(ABC):
         Create the dataset folder if it doesn't already exist.
         """
         os.makedirs(self.folder, exist_ok=True)
+
+    def delete_folder(self):
+        """
+        Delete the dataset folder and its content.
+        """
+        if os.path.exists(self.folder):
+            shutil.rmtree(self.folder)
 
 
 def get_cerema_organization(api_key: str | None = None) -> datagouv.Organization:

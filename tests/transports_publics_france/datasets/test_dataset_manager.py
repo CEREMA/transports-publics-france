@@ -158,6 +158,20 @@ class TestDataSetManager:
 
         mock.assert_called_with(example_instance.folder, exist_ok=True)
 
+    def test_delete_folder(self, example_instance, mocker):
+        mock1 = mocker.patch(
+            "transports_publics_france.datasets.dataset_manager.os.path.exists",
+            return_value=True,
+        )
+        mock2 = mocker.patch(
+            "transports_publics_france.datasets.dataset_manager.shutil.rmtree"
+        )
+
+        example_instance.delete_folder()
+
+        mock1.assert_called_once()
+        mock2.assert_called_once()
+
 
 def test_get_cerema_organization(mocker):
     mock = mocker.patch(

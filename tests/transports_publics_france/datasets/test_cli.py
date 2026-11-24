@@ -58,3 +58,15 @@ def test_main_dry_publish(mock_command_line, mocker):
     main()
 
     mock.assert_called_with(dry=True)
+
+
+def test_main_clean(mock_command_line, mocker):
+    mock_command_line(["demo", "--clean"])
+
+    mock = mocker.patch(
+        "transports_publics_france.datasets.cli.DatasetManager.delete_folder"
+    )
+
+    main()
+
+    mock.assert_called_once()
