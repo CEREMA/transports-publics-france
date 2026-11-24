@@ -32,7 +32,7 @@ of [several opendata datasets](src/transports_publics_france/datasets/README.md)
 You can reproduce this generation process by running the `generate-dataset` command that comes with the package:
 
 ```bash
-# DATASET_KEY is the prefix in `{key}_dataset.py`
+# find the dataset keys in the dataset documentation linked before
 generate-dataset DATASET_KEY
 ```
 

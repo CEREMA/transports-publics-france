@@ -7,7 +7,7 @@ and contains instructions to generate its resources.
 
 ## List of datasets and their generating scripts
 
-### [Network report](https://www.data.gouv.fr/datasets/6a97e28ffcf92f8247d2ef0b) ([gtfs_resource_list.py](gtfs_resource_list.py)) 
+### [Network report](https://www.data.gouv.fr/datasets/6a97e28ffcf92f8247d2ef0b) (key: [gtfs_resource_list](gtfs_resource_list.py))
 
 One row per GTFS resource referenced on transport.data.gouv.fr, with declarative metadata, metadata observed in the GTFS files, and the regional aggregate containing each network, if any.
 
@@ -17,7 +17,7 @@ Documentation of the fields: [gtfs_resource_list.md](gtfs_resource_list.md)
 
 - YYYYMMDD_gtfs_resource_list.csv: list of GTFS datasets referenced on [transport.data.gouv.fr](https://transport.data.gouv.fr)
 
-### Demo dataset ([demo.py](demo.py)) 
+### Demo dataset (key: [demo](demo.py))
 
 Dataset for demonstrating how datasets are published in the `transports-public-france` package.
 
