@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.3.0](https://github.com/CEREMA/transports-publics-france/compare/v0.2.0...v0.3.0) (2026-11-26)
+
+
+### Features
+
+* add a --clean option to the generate-dataset command ([#17](https://github.com/CEREMA/transports-publics-france/issues/17)) ([2ea2680](https://github.com/CEREMA/transports-publics-france/commit/2ea2680728dd24c8902a6a18ec80a57622be80c8))
+
+
+### Documentation
+
+* documentation fixes ([#14](https://github.com/CEREMA/transports-publics-france/issues/14)) ([a507bd7](https://github.com/CEREMA/transports-publics-france/commit/a507bd7d416715d6f913733bab1fee2f1a3a9bc2))
+* fix documentation typo and make keys appear more clearly ([42b7903](https://github.com/CEREMA/transports-publics-france/commit/42b790343904bd72d377484aa9002ca5f98fb442))
+* update LICENSE.txt ([2e3c5e9](https://github.com/CEREMA/transports-publics-france/commit/2e3c5e972df3dae331d907072d61871ebba6f74a))
+
 ## [0.2.0](https://github.com/CEREMA/transports-publics-france/compare/v0.1.0...v0.2.0) (2026-11-10)
 
 
