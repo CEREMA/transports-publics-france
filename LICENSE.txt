@@ -1,4 +1,4 @@
-Copyright (c) UGE & Tellae
+Copyright (c) CEREMA
 
 CeCILL-B FREE SOFTWARE LICENSE AGREEMENT
 
